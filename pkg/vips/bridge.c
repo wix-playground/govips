@@ -300,3 +300,7 @@ int label(VipsImage *in, VipsImage **out, LabelOptions *o) {
 	g_object_unref(base);
 	return 0;
 }
+
+int has_alpha_channel(VipsImage *image) {
+	return vips_image_hasalpha(image);
+}
