@@ -193,6 +193,10 @@ func (r *ImageRef) HasAlpha() bool {
 }
 
 func (r *ImageRef) AddAlpha() (*ImageRef, error) {
+	if vipsHasAlpha(r.image) {
+		return r, nil
+	}
+
 	withAlpha, err := vipsAddAlpha(r.image)
 	if err != nil {
 		return nil, err

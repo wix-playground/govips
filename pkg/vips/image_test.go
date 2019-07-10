@@ -183,6 +183,17 @@ func TestImageRef_AddAlpha(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestImageRef_AddAlpha__AlreadyHasAlpha__Idempotent(t *testing.T) {
+	image, err := vips.NewImageFromFile("testdata/with_alpha.png")
+	require.NoError(t, err)
+	withAlpha, err := image.AddAlpha()
+	require.NoError(t, err)
+	assert.Equal(t, image, withAlpha)
+
+	_, _, err = withAlpha.Export(vips.ExportParams{})
+	assert.NoError(t, err)
+}
+
 func TestImageRef_HasProfile(t *testing.T) {
 	tests := []struct {
 		name string
