@@ -304,3 +304,7 @@ int label(VipsImage *in, VipsImage **out, LabelOptions *o) {
 int has_alpha_channel(VipsImage *image) {
 	return vips_image_hasalpha(image);
 }
+
+int add_alpha(VipsImage *in, VipsImage **out) {
+	return vips_addalpha(in, out, NULL);
+}
