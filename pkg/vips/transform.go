@@ -373,6 +373,7 @@ func (t *Transform) importImage() (*C.VipsImage, ImageType, error) {
 		cpy, err := vipsCopyImage(t.input.Image.image)
 		return cpy, t.input.Image.Format(), err
 	}
+
 	if t.input.Reader == nil {
 		panic("no input source specified")
 	}
