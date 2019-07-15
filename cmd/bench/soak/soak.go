@@ -47,13 +47,12 @@ func main() {
 		defer pprof.StopCPUProfile()
 	}
 
-	cfg := &vips.Config{
+	vips.Startup(&vips.Config{
 		ConcurrencyLevel: *concurrencyFlag,
 		MaxCacheMem:      *maxCacheMemFlag,
 		MaxCacheSize:     *maxCacheSizeFlag,
 		CollectStats:     true,
-	}
-	vips.Startup(cfg)
+	})
 
 	numCPUs := runtime.NumCPU()
 	runtime.GOMAXPROCS(numCPUs + 1)

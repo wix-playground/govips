@@ -31,8 +31,6 @@ func TestTransform(t *testing.T) {
 	assert.Equal(t, 400, image.Height())
 
 	image.Close()
-	ShutdownThread()
-	Shutdown()
 
 	PrintObjectReport("Final")
 }
