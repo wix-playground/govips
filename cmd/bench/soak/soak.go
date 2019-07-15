@@ -14,7 +14,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/wix-playground/govips/pkg/vips"
+	"github.com/wix-playground/govips/vips"
 )
 
 var (
@@ -152,7 +152,7 @@ func loadFile(file string) []byte {
 func outputStats() {
 	var mem runtime.MemStats
 	runtime.ReadMemStats(&mem)
-	var vipsMem vips.VipsMemoryStats
+	var vipsMem vips.MemoryStats
 	vips.ReadVipsMemStats(&vipsMem)
 
 	var stats vips.RuntimeStats

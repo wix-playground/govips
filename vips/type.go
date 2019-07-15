@@ -43,9 +43,6 @@ type Color struct {
 
 const DefaultFont = "sans 10"
 
-// ColorBlack is shorthand for black RGB
-var ColorBlack = Color{0, 0, 0}
-
 // LabelParams represents a text-based label
 type LabelParams struct {
 	Text      string

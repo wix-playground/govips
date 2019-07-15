@@ -324,7 +324,16 @@ func vipsComposite(inputs []*C.VipsImage, mode BlendMode) (*C.VipsImage, error) 
 		return nil, handleVipsError()
 	}
 
-	// todo: why no unrefImage?
+	return output, nil
+}
+
+func vipsBandJoin(inputs []*C.VipsImage) (*C.VipsImage, error) {
+	incOpCounter("bandJoin")
+	var output *C.VipsImage
+
+	if err := C.bandjoin(&inputs[0], &output, C.int(len(inputs))); err != 0 {
+		return nil, handleVipsError()
+	}
 
 	return output, nil
 }
@@ -381,23 +390,6 @@ func vipsExtractBand(input *C.VipsImage, band, num int) (*C.VipsImage, error) {
 	defer unrefImage(input)()
 
 	if err := C.extract_band(input, &output, C.int(band), C.int(num)); err != 0 {
-		return nil, handleVipsError()
-	}
-
-	return output, nil
-}
-
-func vipsBandJoin(inputs []*C.VipsImage) (*C.VipsImage, error) {
-	incOpCounter("bandJoin")
-	var output *C.VipsImage
-
-	defer func() {
-		for _, image := range inputs {
-			unrefImage(image)()
-		}
-	}()
-
-	if err := C.bandjoin(&inputs[0], &output, C.int(len(inputs))); err != 0 {
 		return nil, handleVipsError()
 	}
 
@@ -507,12 +499,7 @@ func vipsLabel(input *C.VipsImage, lp LabelParams) (*C.VipsImage, error) {
 	font := C.CString(lp.Font)
 	defer C.free(unsafe.Pointer(font))
 
-	color := [3]C.double{
-		C.double(lp.Color.R),
-		C.double(lp.Color.G),
-		C.double(lp.Color.B),
-	}
-
+	color := [3]C.double{C.double(lp.Color.R), C.double(lp.Color.G), C.double(lp.Color.B)}
 	w := lp.Width.GetRounded(int(input.Xsize))
 	h := lp.Height.GetRounded(int(input.Ysize))
 	offsetX := lp.OffsetX.GetRounded(int(input.Xsize))

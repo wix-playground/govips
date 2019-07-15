@@ -358,12 +358,11 @@ func (t *Transform) Apply() ([]byte, ImageType, error) {
 	}
 
 	transformed, err := t.transform(input, imageType)
-
 	if err != nil {
 		return nil, ImageTypeUnknown, err
 	}
 
-	defer C.g_object_unref(C.gpointer(transformed))
+	defer unrefImage(transformed)()
 
 	return t.exportImage(transformed, imageType)
 }
@@ -377,11 +376,13 @@ func (t *Transform) importImage() (*C.VipsImage, ImageType, error) {
 	if t.input.Reader == nil {
 		panic("no input source specified")
 	}
+
 	var err error
 	t.source, err = ioutil.ReadAll(t.input.Reader)
 	if err != nil {
 		return nil, ImageTypeUnknown, nil
 	}
+
 	return vipsLoadFromBuffer(t.source)
 }
 
