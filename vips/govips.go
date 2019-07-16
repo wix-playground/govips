@@ -9,6 +9,18 @@ import (
 	"sync"
 )
 
+//noinspection GoUnusedConst
+const Version = string(C.VIPS_VERSION)
+
+//noinspection GoUnusedConst
+const MajorVersion = int(C.VIPS_MAJOR_VERSION)
+
+//noinspection GoUnusedConst
+const MinorVersion = int(C.VIPS_MINOR_VERSION)
+
+//noinspection GoUnusedConst
+const MicroVersion = int(C.VIPS_MICRO_VERSION) // A.K.A patch version
+
 const (
 	defaultConcurrencyLevel = 1
 	defaultMaxCacheMem      = 100 * 1024 * 1024
@@ -54,7 +66,7 @@ func Startup(config *Config) {
 
 	err := C.vips_init(cName)
 	if err != 0 {
-		panic(fmt.Sprintf("Failed to start vips code=%d", err))
+		panic(fmt.Sprintf("Failed to start vips code=%v", err))
 	}
 
 	running = true
@@ -121,11 +133,13 @@ func ShutdownThread() {
 	C.vips_thread_shutdown()
 }
 
-func VipsClearCache() {
+//noinspection GoUnusedExportedFunction
+func ClearCache() {
 	C.vips_cache_drop_all()
 }
 
-func VipsPrintCache() {
+//noinspection GoUnusedExportedFunction
+func PrintCache() {
 	C.vips_cache_print()
 }
 
