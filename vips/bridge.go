@@ -463,11 +463,24 @@ func vipsInvert(input *C.VipsImage) (*C.VipsImage, error) {
 	return output, nil
 }
 
+// https://libvips.github.io/libvips/API/current/libvips-convolution.html#vips-gaussblur
 func vipsGaussianBlur(input *C.VipsImage, sigma float64) (*C.VipsImage, error) {
 	incOpCounter("gaussblur")
 	var output *C.VipsImage
 
 	if err := C.gaussian_blur(input, &output, C.double(sigma)); err != 0 {
+		return nil, handleVipsError()
+	}
+
+	return output, nil
+}
+
+// https://libvips.github.io/libvips/API/current/libvips-convolution.html#vips-sharpen
+func vipsSharpen(input *C.VipsImage, sigma float64, x1 float64, m2 float64) (*C.VipsImage, error) {
+	incOpCounter("sharpen")
+	var output *C.VipsImage
+
+	if err := C.sharpen(input, &output, C.double(sigma), C.double(x1), C.double(m2)); err != 0 {
 		return nil, handleVipsError()
 	}
 

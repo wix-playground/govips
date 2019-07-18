@@ -184,19 +184,6 @@ func TestBandJoin(t *testing.T) {
 	assertGoldenMatch(t, resources+"tomatoes.png", buf)
 }
 
-func TestLinear1(t *testing.T) {
-	image, err := NewImageFromFile(resources + "tomatoes.png")
-	require.NoError(t, err)
-	defer image.Close()
-
-	err = image.Linear1(3, 4)
-	require.NoError(t, err)
-
-	buf, _, err := image.Export(nil)
-	require.NoError(t, err)
-	assertGoldenMatch(t, resources+"tomatoes.png", buf)
-}
-
 func goldenTest(t *testing.T, file string, fn func(t *Transform)) []byte {
 	if testing.Short() {
 		return nil

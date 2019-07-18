@@ -182,3 +182,27 @@ func TestImageRef_Close(t *testing.T) {
 
 	PrintObjectReport("Final")
 }
+
+func TestLinear1(t *testing.T) {
+	image, err := NewImageFromFile(resources + "tomatoes.png")
+	require.NoError(t, err)
+	defer image.Close()
+
+	err = image.Linear1(3, 4)
+	require.NoError(t, err)
+
+	_, _, err = image.Export(nil)
+	require.NoError(t, err)
+}
+
+func TestSharpen(t *testing.T) {
+	image, err := NewImageFromFile(resources + "tomatoes.png")
+	require.NoError(t, err)
+	defer image.Close()
+
+	err = image.Sharpen(3, 4, 5)
+	require.NoError(t, err)
+
+	_, _, err = image.Export(nil)
+	require.NoError(t, err)
+}

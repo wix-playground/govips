@@ -1,6 +1,7 @@
 package vips
 
 import (
+	"runtime"
 	"sync"
 	"testing"
 
@@ -115,6 +116,7 @@ func run(fn func()) {
 
 	//ShutdownThread()
 	//Shutdown()
+	runtime.GC()
 
 	PrintObjectReport("Finished")
 }

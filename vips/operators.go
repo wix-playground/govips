@@ -2008,19 +2008,6 @@ func Sequential(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	return out, err
 }
 
-// Sharpen executes the 'sharpen' operation
-func Sharpen(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		OutputImage("out", &out),
-	)
-	incOpCounter("sharpen")
-	err = vipsCall("sharpen", options)
-	return out, err
-}
-
 // Shrink executes the 'shrink' operation
 func Shrink(in *C.VipsImage, hshrink float64, vshrink float64, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage

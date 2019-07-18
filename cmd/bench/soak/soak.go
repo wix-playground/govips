@@ -118,7 +118,7 @@ func soak() {
 				}
 				defer img.Close()
 
-				_, _, err = vips.NewTransform().Resize(w, h).ApplyAndExport(img)
+				_, _, err = vips.NewTransform().Resize(w, h).Format(vips.ImageTypeWEBP).ApplyAndExport(img)
 
 				if count%batch == 0 {
 					log.Printf("Processed %d...\n", count)

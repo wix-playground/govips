@@ -75,12 +75,17 @@ int embed_image(VipsImage *in, VipsImage **out, int left, int top, int width, in
 int extract_image_area(VipsImage *in, VipsImage **out, int left, int top, int width, int height);
 int flatten_image_background(VipsImage *in, VipsImage **out, double r, double g, double b);
 int transform_image(VipsImage *in, VipsImage **out, double a, double b, double c, double d, VipsInterpolate *interpolator);
-int gaussian_blur(VipsImage *in, VipsImage **out, double sigma);
 int invert_image(VipsImage *in, VipsImage **out);
 int composite(VipsImage **in, VipsImage **out, int n, int mode);
 int label(VipsImage *in, VipsImage **out, LabelOptions *o);
 
-void gobject_set_property(VipsObject* object, const char* name, const GValue* value);
-
 int has_alpha_channel(VipsImage *image);
 int add_alpha(VipsImage *in, VipsImage **out);
+
+// Convolutions
+// https://libvips.github.io/libvips/API/current/libvips-convolution.html
+int gaussian_blur(VipsImage *in, VipsImage **out, double sigma);
+int sharpen(VipsImage *in, VipsImage **out, double sigma, double x1, double m2);
+
+
+void gobject_set_property(VipsObject* object, const char* name, const GValue* value);

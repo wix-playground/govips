@@ -27,6 +27,9 @@ type TransformParams struct {
 	CropOffsetY             Scalar
 	MaxScale                float64
 	Label                   *LabelParams
+	SharpSigma              float64
+	SharpX1                 float64
+	SharpM2                 float64
 }
 
 // Transform handles single image transformations
@@ -131,7 +134,13 @@ func (t *Transform) GaussianBlur(sigma float64) *Transform {
 	return t
 }
 
-// todo: sharpen (usm)
+// Sharpen applies a sharpen to the image
+func (t *Transform) Sharpen(sigma float64, x1 float64, m2 float64) *Transform {
+	t.transformParams.SharpSigma = sigma
+	t.transformParams.SharpX1 = x1
+	t.transformParams.SharpM2 = m2
+	return t
+}
 
 // Rotate rotates image by a multiple of 90 degrees
 func (t *Transform) Rotate(angle Angle) *Transform {
@@ -571,6 +580,13 @@ func (b *blackboard) postProcess() error {
 
 	if b.BlurSigma > 0 {
 		err = b.image.GaussianBlur(b.BlurSigma)
+		if err != nil {
+			return err
+		}
+	}
+
+	if b.SharpSigma > 0 {
+		err = b.image.Sharpen(b.SharpSigma, b.SharpX1, b.SharpM2)
 		if err != nil {
 			return err
 		}
