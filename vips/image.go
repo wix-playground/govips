@@ -92,7 +92,7 @@ func (r *ImageRef) Metadata() *ImageMetadata {
 // https://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-copy
 // create a new ref
 func (r *ImageRef) Copy(options ...*Option) (*ImageRef, error) {
-	out, err := Copy(r.image, options...)
+	out, err := vipsCopyImage(r.image)
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +217,7 @@ func (r *ImageRef) Export(params *ExportParams) ([]byte, *ImageMetadata, error) 
 	return buf, metadata, nil
 }
 
-// https://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-composite
+// compose images
 func (r *ImageRef) Composite(overlay *ImageRef, mode BlendMode) error {
 	out, err := vipsComposite([]*C.VipsImage{r.image, overlay.image}, mode)
 	if err != nil {
@@ -228,9 +228,8 @@ func (r *ImageRef) Composite(overlay *ImageRef, mode BlendMode) error {
 }
 
 // ExtractBand executes the 'extract_band' operation
-// https://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-extract-band
-func (r *ImageRef) ExtractBand(band int, options ...*Option) error {
-	out, err := ExtractBand(r.image, band, options...)
+func (r *ImageRef) ExtractBand(band int, num int) error {
+	out, err := vipsExtractBand(r.image, band, num)
 	if err != nil {
 		return err
 	}
@@ -265,7 +264,6 @@ func (r *ImageRef) AddAlpha() error {
 	return nil
 }
 
-//  https://libvips.github.io/libvips/API/current/libvips-arithmetic.html#vips-linear1
 func (r *ImageRef) Linear1(a, b float64) error {
 	out, err := vipsLinear1(r.image, a, b)
 	if err != nil {
@@ -407,8 +405,8 @@ func (r *ImageRef) Complexget(get OperationComplexGet, options ...*Option) error
 }
 
 // ExtractArea executes the 'extract_area' operation
-func (r *ImageRef) ExtractArea(left int, top int, width int, height int, options ...*Option) error {
-	out, err := ExtractArea(r.image, left, top, width, height, options...)
+func (r *ImageRef) ExtractArea(left int, top int, width int, height int) error {
+	out, err := vipsExtractArea(r.image, left, top, width, height)
 	if err != nil {
 		return err
 	}
@@ -479,6 +477,16 @@ func (r *ImageRef) Gamma(options ...*Option) error {
 // Gaussblur executes the 'gaussblur' operation
 func (r *ImageRef) GaussianBlur(sigma float64, options ...*Option) error {
 	out, err := vipsGaussianBlur(r.image, sigma)
+	if err != nil {
+		return err
+	}
+	r.setImage(out)
+	return nil
+}
+
+// Sharpen executes the 'sharpen' operation
+func (r *ImageRef) Sharpen(options ...*Option) error {
+	out, err := Sharpen(r.image, options...)
 	if err != nil {
 		return err
 	}
@@ -999,16 +1007,6 @@ func (r *ImageRef) Scrgb2Xyz(options ...*Option) error {
 // Sequential executes the 'sequential' operation
 func (r *ImageRef) Sequential(options ...*Option) error {
 	out, err := Sequential(r.image, options...)
-	if err != nil {
-		return err
-	}
-	r.setImage(out)
-	return nil
-}
-
-// Sharpen executes the 'sharpen' operation
-func (r *ImageRef) Sharpen(options ...*Option) error {
-	out, err := Sharpen(r.image, options...)
 	if err != nil {
 		return err
 	}

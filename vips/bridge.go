@@ -158,6 +158,7 @@ func vipsLoadFromBuffer(buf []byte, opts ...LoadOption) (*C.VipsImage, ImageType
 	return image, imageType, nil
 }
 
+// https://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-copy
 func vipsCopyImage(input *C.VipsImage) (*C.VipsImage, error) {
 	var output *C.VipsImage
 
@@ -339,6 +340,7 @@ func vipsRotate(input *C.VipsImage, angle Angle) (*C.VipsImage, error) {
 	return output, nil
 }
 
+// https://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-composite
 func vipsComposite(inputs []*C.VipsImage, mode BlendMode) (*C.VipsImage, error) {
 	incOpCounter("composite")
 	var output *C.VipsImage
@@ -406,11 +408,10 @@ func vipsMultiply(left *C.VipsImage, right *C.VipsImage) (*C.VipsImage, error) {
 	return output, nil
 }
 
+// https://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-extract-band
 func vipsExtractBand(input *C.VipsImage, band, num int) (*C.VipsImage, error) {
 	incOpCounter("extractBand")
 	var output *C.VipsImage
-
-	defer unrefImage(input)
 
 	if err := C.extract_band(input, &output, C.int(band), C.int(num)); err != 0 {
 		return nil, handleVipsError()
@@ -419,11 +420,10 @@ func vipsExtractBand(input *C.VipsImage, band, num int) (*C.VipsImage, error) {
 	return output, nil
 }
 
+//  https://libvips.github.io/libvips/API/current/libvips-arithmetic.html#vips-linear1
 func vipsLinear1(input *C.VipsImage, a, b float64) (*C.VipsImage, error) {
 	incOpCounter("linear1")
 	var output *C.VipsImage
-
-	defer unrefImage(input)
 
 	if err := C.linear1(input, &output, C.double(a), C.double(b)); err != 0 {
 		return nil, handleVipsError()
@@ -435,8 +435,6 @@ func vipsLinear1(input *C.VipsImage, a, b float64) (*C.VipsImage, error) {
 func vipsExtractArea(input *C.VipsImage, left, top, width, height int) (*C.VipsImage, error) {
 	incOpCounter("extractArea")
 	var output *C.VipsImage
-
-	defer unrefImage(input)
 
 	if err := C.extract_image_area(input, &output, C.int(left), C.int(top), C.int(width), C.int(height)); err != 0 {
 		return nil, handleVipsError()

@@ -33,13 +33,13 @@ int init_image(void *buf, size_t len, int imageType, ImageLoadOptions *o, VipsIm
 	return code;
 }
 
-int load_jpeg_buffer(void *buf, size_t len, VipsImage **out, int shrink) {
-  if (shrink > 0) {
-    return vips_jpegload_buffer(buf, len, out, "shrink", shrink, NULL);
-  } else {
-    return vips_jpegload_buffer(buf, len, out, NULL);
-  }
-}
+//int load_jpeg_buffer(void *buf, size_t len, VipsImage **out, int shrink) {
+//  if (shrink > 0) {
+//    return vips_jpegload_buffer(buf, len, out, "shrink", shrink, NULL);
+//  } else {
+//    return vips_jpegload_buffer(buf, len, out, NULL);
+//  }
+//}
 
 int copy_image(VipsImage *in, VipsImage **out) {
 	return vips_copy(in, out, NULL);
@@ -151,7 +151,6 @@ int extract_band(VipsImage *in, VipsImage **out, int band, int num) {
 int bandjoin(VipsImage **in, VipsImage **out, int n) {
 	return vips_bandjoin(in, out, n, NULL);
 }
-
 
 int linear1(VipsImage *in, VipsImage **out, double a, double b) {
 	return vips_linear1(in, out, a, b, NULL);

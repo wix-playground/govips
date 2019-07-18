@@ -42,7 +42,7 @@ int init_image(void *buf, size_t len, int imageType, ImageLoadOptions *o, VipsIm
 int find_image_type_loader(int t);
 int find_image_type_saver(int t);
 
-int load_jpeg_buffer(void *buf, size_t len, VipsImage **out, int shrink);
+//int load_jpeg_buffer(void *buf, size_t len, VipsImage **out, int shrink);
 
 int save_jpeg_buffer(VipsImage* image, void **buf, size_t *len, int strip, int quality, int interlace);
 int save_png_buffer(VipsImage *in, void **buf, size_t *len, int strip, int compression, int quality, int interlace);

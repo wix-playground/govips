@@ -80,9 +80,9 @@ func TestImageTypeSupport_HEIF(t *testing.T) {
 		assert.NotNil(t, img)
 	}
 
-	_, imageType, err := img.Export(nil)
+	_, metadata, err := img.Export(nil)
 	assert.NoError(t, err)
-	assert.Equal(t, ImageTypeHEIF, imageType)
+	assert.Equal(t, ImageTypeHEIF, metadata.Format)
 }
 
 func TestImageRef_HasAlpha__True(t *testing.T) {
