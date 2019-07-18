@@ -125,8 +125,8 @@ func (t *Transform) Flip(flip FlipDirection) *Transform {
 	return t
 }
 
-// GaussBlur applies a gaussian blur to the image
-func (t *Transform) GaussBlur(sigma float64) *Transform {
+// GaussianBlur applies a gaussian blur to the image
+func (t *Transform) GaussianBlur(sigma float64) *Transform {
 	t.transformParams.BlurSigma = sigma
 	return t
 }

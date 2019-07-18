@@ -89,7 +89,7 @@ func TestCleanup(t *testing.T) {
 					Flip(tr.Flip).
 					Kernel(tr.Kernel).
 					Format(tr.Format).
-					GaussBlur(tr.Blur).
+					GaussianBlur(tr.Blur).
 					Interpolator(tr.Interp).
 					Zoom(tr.Zoom, tr.Zoom).
 					Quality(tr.Quality).
