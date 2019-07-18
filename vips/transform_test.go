@@ -124,6 +124,12 @@ func TestRotate(t *testing.T) {
 	})
 }
 
+func TestAutoRotate(t *testing.T) {
+	goldenTest(t, resources+"canyon.jpg", func(tx *Transform) {
+		tx.AutoRotate()
+	})
+}
+
 func TestScale3x(t *testing.T) {
 	goldenTest(t, resources+"tomatoes.png", func(tx *Transform) {
 		tx.Scale(3.0)

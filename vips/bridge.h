@@ -66,11 +66,9 @@ int linear1(VipsImage *in, VipsImage **out, double a, double b);
 int add(VipsImage *left, VipsImage *right, VipsImage **out);
 int multiply(VipsImage *left, VipsImage *right, VipsImage **out);
 int resize_image(VipsImage *in, VipsImage **out, double scale, double vscale, int kernel);
-int rot_image(VipsImage *in, VipsImage **out, VipsAngle angle);
 int flip_image(VipsImage *in, VipsImage **out, int direction);
 int shrink_image(VipsImage *in, VipsImage **out, double xshrink, double yshrink);
 int reduce_image(VipsImage *in, VipsImage **out, double xshrink, double yshrink);
-int zoom_image(VipsImage *in, VipsImage **out, int xfac, int yfac);
 int embed_image(VipsImage *in, VipsImage **out, int left, int top, int width, int height, int extend, double r, double g, double b);
 int extract_image_area(VipsImage *in, VipsImage **out, int left, int top, int width, int height);
 int flatten_image_background(VipsImage *in, VipsImage **out, double r, double g, double b);
@@ -81,6 +79,12 @@ int label(VipsImage *in, VipsImage **out, LabelOptions *o);
 
 int has_alpha_channel(VipsImage *image);
 int add_alpha(VipsImage *in, VipsImage **out);
+
+// conversion
+// https://libvips.github.io/libvips/API/current/libvips-conversion.html
+int autorot_image(VipsImage *in, VipsImage **out);
+int rot_image(VipsImage *in, VipsImage **out, VipsAngle angle);
+int zoom_image(VipsImage *in, VipsImage **out, int xfac, int yfac);
 
 // Convolutions
 // https://libvips.github.io/libvips/API/current/libvips-convolution.html

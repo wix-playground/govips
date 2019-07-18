@@ -35,19 +35,6 @@ func Add(left *C.VipsImage, right *C.VipsImage, options ...*Option) (*C.VipsImag
 	return out, err
 }
 
-// Autorot executes the 'autorot' operation
-func Autorot(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		OutputImage("out", &out),
-	)
-	incOpCounter("autorot")
-	err = vipsCall("autorot", options)
-	return out, err
-}
-
 // Avg executes the 'avg' operation
 func Avg(in *C.VipsImage, options ...*Option) (float64, error) {
 	var out float64

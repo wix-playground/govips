@@ -109,8 +109,16 @@ int resize_image(VipsImage *in, VipsImage **out, double scale, double vscale, in
 	return vips_resize(in, out, scale, "kernel", kernel, NULL);
 }
 
+int autorot_image(VipsImage *in, VipsImage **out) {
+  return vips_autorot(in, out, NULL);
+}
+
 int rot_image(VipsImage *in, VipsImage **out, VipsAngle angle) {
   return vips_rot(in, out, angle, NULL);
+}
+
+int zoom_image(VipsImage *in, VipsImage **out, int xfac, int yfac) {
+	return vips_zoom(in, out, xfac, yfac, NULL);
 }
 
 int flip_image(VipsImage *in, VipsImage **out, int direction) {
@@ -123,10 +131,6 @@ int shrink_image(VipsImage *in, VipsImage **out, double xshrink, double yshrink)
 
 int reduce_image(VipsImage *in, VipsImage **out, double xshrink, double yshrink) {
 	return vips_reduce(in, out, xshrink, yshrink, NULL);
-}
-
-int zoom_image(VipsImage *in, VipsImage **out, int xfac, int yfac) {
-	return vips_zoom(in, out, xfac, yfac, NULL);
 }
 
 int text(VipsImage **out, const char *text, const char *font, int width, int height, VipsAlign align, int dpi) {

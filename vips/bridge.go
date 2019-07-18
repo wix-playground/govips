@@ -318,22 +318,35 @@ func vipsEmbed(input *C.VipsImage, left, top, width, height int, extend ExtendSt
 	return output, nil
 }
 
-func vipsZoom(input *C.VipsImage, xFactor, yFactor int) (*C.VipsImage, error) {
-	incOpCounter("zoom")
+// https://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-autorot
+func vipsAutoRotate(input *C.VipsImage) (*C.VipsImage, error) {
+	incOpCounter("autorot")
 	var output *C.VipsImage
 
-	if err := C.zoom_image(input, &output, C.int(xFactor), C.int(yFactor)); err != 0 {
+	if err := C.autorot_image(input, &output); err != 0 {
 		return nil, handleVipsError()
 	}
 
 	return output, nil
 }
 
+// https://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-autorot
 func vipsRotate(input *C.VipsImage, angle Angle) (*C.VipsImage, error) {
 	incOpCounter("rot")
 	var output *C.VipsImage
 
 	if err := C.rot_image(input, &output, C.VipsAngle(angle)); err != 0 {
+		return nil, handleVipsError()
+	}
+
+	return output, nil
+}
+
+func vipsZoom(input *C.VipsImage, xFactor, yFactor int) (*C.VipsImage, error) {
+	incOpCounter("zoom")
+	var output *C.VipsImage
+
+	if err := C.zoom_image(input, &output, C.int(xFactor), C.int(yFactor)); err != 0 {
 		return nil, handleVipsError()
 	}
 

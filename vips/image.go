@@ -284,8 +284,8 @@ func (r *ImageRef) Abs(options ...*Option) error {
 }
 
 // Autorot executes the 'autorot' operation
-func (r *ImageRef) Autorot(options ...*Option) error {
-	out, err := Autorot(r.image, options...)
+func (r *ImageRef) AutoRotate() error {
+	out, err := vipsAutoRotate(r.image)
 	if err != nil {
 		return err
 	}

@@ -19,6 +19,7 @@ type TransformParams struct {
 	ZoomY                   int
 	Invert                  bool
 	Rotate                  Angle
+	AutoRotate              bool
 	BlurSigma               float64
 	Flip                    FlipDirection
 	Width                   Scalar
@@ -139,6 +140,12 @@ func (t *Transform) Sharpen(sigma float64, x1 float64, m2 float64) *Transform {
 	t.transformParams.SharpSigma = sigma
 	t.transformParams.SharpX1 = x1
 	t.transformParams.SharpM2 = m2
+	return t
+}
+
+// AutoRotate rotates image by a the embedded metadata (EXIF Orientation, etc.)
+func (t *Transform) AutoRotate() *Transform {
+	t.transformParams.AutoRotate = true
 	return t
 }
 
@@ -587,6 +594,13 @@ func (b *blackboard) postProcess() error {
 
 	if b.SharpSigma > 0 {
 		err = b.image.Sharpen(b.SharpSigma, b.SharpX1, b.SharpM2)
+		if err != nil {
+			return err
+		}
+	}
+
+	if b.AutoRotate {
+		err = b.image.AutoRotate()
 		if err != nil {
 			return err
 		}
