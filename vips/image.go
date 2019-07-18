@@ -269,7 +269,6 @@ func (r *ImageRef) Linear1(a, b float64) error {
 	if err != nil {
 		return err
 	}
-
 	r.setImage(out)
 	return nil
 }

@@ -19,6 +19,9 @@ func TestLoadImage_AccessMode_Default(t *testing.T) {
 
 	src := bytes.NewReader(srcBytes)
 	img, err := NewImageFromReader(src)
+	require.NoError(t, err)
+	defer img.Close()
+
 	if assert.NoError(t, err) {
 		assert.NotNil(t, img)
 		// check random access by encoding twice
@@ -26,7 +29,6 @@ func TestLoadImage_AccessMode_Default(t *testing.T) {
 		assert.NoError(t, err)
 		_, _, err = img.Export(nil)
 		assert.NoError(t, err)
-
 	}
 }
 
@@ -38,6 +40,9 @@ func TestLoadImage_AccessMode_Random(t *testing.T) {
 
 	src := bytes.NewReader(srcBytes)
 	img, err := NewImageFromReader(src, WithAccessMode(AccessRandom))
+	require.NoError(t, err)
+	defer img.Close()
+
 	if assert.NoError(t, err) {
 		assert.NotNil(t, img)
 		// check random access by encoding twice
@@ -46,7 +51,6 @@ func TestLoadImage_AccessMode_Random(t *testing.T) {
 		_, _, err = img.Export(nil)
 		assert.NoError(t, err)
 	}
-
 }
 
 func TestLoadImage_AccessMode_Sequential(t *testing.T) {
@@ -57,6 +61,9 @@ func TestLoadImage_AccessMode_Sequential(t *testing.T) {
 
 	src := bytes.NewReader(srcBytes)
 	img, err := NewImageFromReader(src, WithAccessMode(AccessSequential))
+	require.NoError(t, err)
+	defer img.Close()
+
 	if assert.NoError(t, err) {
 		assert.NotNil(t, img)
 		// check sequential access by encoding twice where the second fails
@@ -66,7 +73,6 @@ func TestLoadImage_AccessMode_Sequential(t *testing.T) {
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "out of order")
 	}
-
 }
 
 func TestImageTypeSupport_HEIF(t *testing.T) {
@@ -76,6 +82,9 @@ func TestImageTypeSupport_HEIF(t *testing.T) {
 	require.NoError(t, err)
 
 	img, err := NewImageFromBuffer(raw)
+	require.NoError(t, err)
+	defer img.Close()
+
 	if assert.NoError(t, err) {
 		assert.NotNil(t, img)
 	}
@@ -88,67 +97,74 @@ func TestImageTypeSupport_HEIF(t *testing.T) {
 func TestImageRef_HasAlpha__True(t *testing.T) {
 	Startup(nil)
 
-	ref, err := NewImageFromFile(resources + "with_alpha.png")
+	img, err := NewImageFromFile(resources + "with_alpha.png")
 	require.NoError(t, err)
+	defer img.Close()
 
-	got := ref.HasAlpha()
+	got := img.HasAlpha()
 	assert.True(t, got)
 }
 
 func TestImageRef_HasAlpha__False(t *testing.T) {
 	Startup(nil)
 
-	ref, err := NewImageFromFile(resources + "test.png")
+	img, err := NewImageFromFile(resources + "test.png")
 	require.NoError(t, err)
+	defer img.Close()
 
-	got := ref.HasAlpha()
+	got := img.HasAlpha()
 	assert.False(t, got)
 }
 
 func TestImageRef_AddAlpha(t *testing.T) {
 	Startup(nil)
 
-	image, err := NewImageFromFile(resources + "test.png")
-	assert.NoError(t, err)
+	img, err := NewImageFromFile(resources + "test.png")
+	require.NoError(t, err)
+	defer img.Close()
 
-	err = image.AddAlpha()
+	err = img.AddAlpha()
 	assert.NoError(t, err)
-	assert.True(t, image.HasAlpha(), "has alpha")
+	assert.True(t, img.HasAlpha(), "has alpha")
 
-	_, _, err = image.Export(nil)
+	_, _, err = img.Export(nil)
 	assert.NoError(t, err)
 }
 
 func TestImageRef_AddAlpha__Idempotent(t *testing.T) {
 	Startup(nil)
 
-	image, err := NewImageFromFile(resources + "with_alpha.png")
-	assert.NoError(t, err)
-	err = image.AddAlpha()
+	img, err := NewImageFromFile(resources + "with_alpha.png")
+	require.NoError(t, err)
+	defer img.Close()
+
+	err = img.AddAlpha()
 	assert.NoError(t, err)
 
-	assert.True(t, image.HasAlpha(), "has alpha")
-	_, _, err = image.Export(nil)
+	assert.True(t, img.HasAlpha(), "has alpha")
+	_, _, err = img.Export(nil)
 	assert.NoError(t, err)
 }
 
 func TestImageRef_HasProfile__True(t *testing.T) {
 	Startup(nil)
 
-	ref, err := NewImageFromFile(resources + "with_icc_profile.jpg")
+	img, err := NewImageFromFile(resources + "with_icc_profile.jpg")
 	require.NoError(t, err)
+	defer img.Close()
 
-	got := ref.HasProfile()
+	got := img.HasProfile()
 	assert.True(t, got)
 }
 
 func TestImageRef_HasProfile__False(t *testing.T) {
 	Startup(nil)
 
-	ref, err := NewImageFromFile(resources + "without_icc_profile.jpg")
+	img, err := NewImageFromFile(resources + "without_icc_profile.jpg")
 	require.NoError(t, err)
+	defer img.Close()
 
-	got := ref.HasProfile()
+	got := img.HasProfile()
 	assert.False(t, got)
 }
 

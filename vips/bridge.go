@@ -131,8 +131,8 @@ func vipsLoadFromBuffer(buf []byte, opts ...LoadOption) (*C.VipsImage, ImageType
 	defer runtime.KeepAlive(buf)
 
 	var image *C.VipsImage
-	imageType := vipsDetermineImageType(buf)
 
+	imageType := vipsDetermineImageType(buf)
 	if imageType == ImageTypeUnknown {
 		if len(buf) > 2 {
 			log.Printf("Failed to understand image format size=%d %x %x %x", len(buf), buf[0], buf[1], buf[2])
@@ -370,8 +370,6 @@ func vipsHasAlpha(input *C.VipsImage) bool {
 func vipsAddAlpha(input *C.VipsImage) (*C.VipsImage, error) {
 	incOpCounter("addAlpha")
 	var output *C.VipsImage
-
-	defer unrefImage(input)
 
 	if err := C.add_alpha(input, &output); err != 0 {
 		return nil, handleVipsError()
