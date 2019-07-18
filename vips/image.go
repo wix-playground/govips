@@ -18,10 +18,16 @@ type ImageRef struct {
 	image  *C.VipsImage
 	format ImageType
 
-	// NOTE(d): We keep a reference to this so that the input buffer is
+	// NOTE: We keep a reference to this so that the input buffer is
 	// never garbage collected during processing. Some image loaders use random
 	// access transcoding and therefore need the original buffer to be in memory.
 	buf []byte
+}
+
+type ImageMetadata struct {
+	Format ImageType
+	Width  int
+	Height int
 }
 
 type LoadOption func(o *vipsLoadOptions)
@@ -41,8 +47,8 @@ func WithAccessMode(a Access) LoadOption {
 	}
 }
 
-// LoadImage loads an ImageRef from the given reader
-func LoadImage(r io.Reader, opts ...LoadOption) (*ImageRef, error) {
+// NewImageFromReader loads an ImageRef from the given reader
+func NewImageFromReader(r io.Reader, opts ...LoadOption) (*ImageRef, error) {
 	buf, err := ioutil.ReadAll(r)
 	if err != nil {
 		return nil, err
@@ -75,6 +81,14 @@ func NewImageFromBuffer(buf []byte, opts ...LoadOption) (*ImageRef, error) {
 	return ref, nil
 }
 
+func (r *ImageRef) Metadata() *ImageMetadata {
+	return &ImageMetadata{
+		Format: r.Format(),
+		Width:  r.Width(),
+		Height: r.Height(),
+	}
+}
+
 // https://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-copy
 // create a new ref
 func (r *ImageRef) Copy(options ...*Option) (*ImageRef, error) {
@@ -83,11 +97,7 @@ func (r *ImageRef) Copy(options ...*Option) (*ImageRef, error) {
 		return nil, err
 	}
 
-	// https://github.com/golang/go/wiki/SliceTricks#copy
-	buf := make([]byte, len(r.buf))
-	buf = append(r.buf[:0:0], r.buf...)
-
-	return newImageRef(out, r.format, buf), nil
+	return newImageRef(out, r.format, r.buf), nil
 }
 
 func newImageRef(vipsImage *C.VipsImage, format ImageType, buf []byte) *ImageRef {
@@ -182,11 +192,29 @@ func (r *ImageRef) Avg(options ...*Option) (float64, error) {
 }
 
 // Export exports the image
-func (r *ImageRef) Export(params ExportParams) ([]byte, ImageType, error) {
-	if params.Format == ImageTypeUnknown {
-		params.Format = r.format
+func (r *ImageRef) Export(params *ExportParams) ([]byte, *ImageMetadata, error) {
+	p := params
+	if p == nil {
+		p = &ExportParams{}
 	}
-	return vipsExportBuffer(r.image, &params)
+
+	if p.Format == ImageTypeUnknown {
+		p.Format = r.format
+	}
+
+	// the exported buf is not necessarily in same format as the original buf, might default to JPEG as well.
+	buf, format, err := vipsExportBuffer(r.image, p)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	metadata := &ImageMetadata{
+		Format: format,
+		Width:  r.Width(),
+		Height: r.Height(),
+	}
+
+	return buf, metadata, nil
 }
 
 // https://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-composite
@@ -378,16 +406,6 @@ func (r *ImageRef) Complexget(get OperationComplexGet, options ...*Option) error
 	return nil
 }
 
-// Embed executes the 'embed' operation
-func (r *ImageRef) Embed(x int, y int, width int, height int, options ...*Option) error {
-	out, err := Embed(r.image, x, y, width, height, options...)
-	if err != nil {
-		return err
-	}
-	r.setImage(out)
-	return nil
-}
-
 // ExtractArea executes the 'extract_area' operation
 func (r *ImageRef) ExtractArea(left int, top int, width int, height int, options ...*Option) error {
 	out, err := ExtractArea(r.image, left, top, width, height, options...)
@@ -428,16 +446,6 @@ func (r *ImageRef) Flatten(options ...*Option) error {
 	return nil
 }
 
-// Flip executes the 'flip' operation
-func (r *ImageRef) Flip(direction Direction, options ...*Option) error {
-	out, err := Flip(r.image, direction, options...)
-	if err != nil {
-		return err
-	}
-	r.setImage(out)
-	return nil
-}
-
 // Float2Rad executes the 'float2rad' operation
 func (r *ImageRef) Float2Rad(options ...*Option) error {
 	out, err := Float2Rad(r.image, options...)
@@ -469,8 +477,8 @@ func (r *ImageRef) Gamma(options ...*Option) error {
 }
 
 // Gaussblur executes the 'gaussblur' operation
-func (r *ImageRef) Gaussblur(sigma float64, options ...*Option) error {
-	out, err := Gaussblur(r.image, sigma, options...)
+func (r *ImageRef) GaussianBlur(sigma float64, options ...*Option) error {
+	out, err := vipsGaussianBlur(r.image, sigma)
 	if err != nil {
 		return err
 	}
@@ -629,8 +637,8 @@ func (r *ImageRef) IccTransform(outputProfile string, options ...*Option) error 
 }
 
 // Invert executes the 'invert' operation
-func (r *ImageRef) Invert(options ...*Option) error {
-	out, err := Invert(r.image, options...)
+func (r *ImageRef) Invert() error {
+	out, err := vipsInvert(r.image)
 	if err != nil {
 		return err
 	}
@@ -869,8 +877,8 @@ func (r *ImageRef) Replicate(across int, down int, options ...*Option) error {
 }
 
 // Resize executes the 'resize' operation
-func (r *ImageRef) Resize(scale float64, options ...*Option) error {
-	out, err := Resize(r.image, scale, options...)
+func (r *ImageRef) Resize(scale float64, vscale float64, kernel Kernel) error {
+	out, err := vipsResize(r.image, scale, vscale, kernel)
 	if err != nil {
 		return err
 	}
@@ -878,9 +886,9 @@ func (r *ImageRef) Resize(scale float64, options ...*Option) error {
 	return nil
 }
 
-// Rot executes the 'rot' operation
-func (r *ImageRef) Rot(angle Angle, options ...*Option) error {
-	out, err := Rot(r.image, angle, options...)
+// Embed executes the 'embed' operation
+func (r *ImageRef) Embed(left, top, width, height int, extend ExtendStrategy) error {
+	out, err := vipsEmbed(r.image, left, top, width, height, extend)
 	if err != nil {
 		return err
 	}
@@ -888,9 +896,49 @@ func (r *ImageRef) Rot(angle Angle, options ...*Option) error {
 	return nil
 }
 
-// Rot45 executes the 'rot45' operation
-func (r *ImageRef) Rot45(options ...*Option) error {
+// Zoom executes the 'zoom' operation
+func (r *ImageRef) Zoom(xFactor int, yFactor int) error {
+	out, err := vipsZoom(r.image, xFactor, yFactor)
+	if err != nil {
+		return err
+	}
+	r.setImage(out)
+	return nil
+}
+
+// Flip executes the 'flip' operation
+func (r *ImageRef) Flip(direction Direction) error {
+	out, err := vipsFlip(r.image, direction)
+	if err != nil {
+		return err
+	}
+	r.setImage(out)
+	return nil
+}
+
+// Rotate executes the 'rot' operation
+func (r *ImageRef) Rotate(angle Angle, options ...*Option) error {
+	out, err := vipsRotate(r.image, angle)
+	if err != nil {
+		return err
+	}
+	r.setImage(out)
+	return nil
+}
+
+// Rotate45 executes the 'rot45' operation
+func (r *ImageRef) Rotate45(options ...*Option) error {
 	out, err := Rot45(r.image, options...)
+	if err != nil {
+		return err
+	}
+	r.setImage(out)
+	return nil
+}
+
+// Label executes the 'label' operation
+func (r *ImageRef) Label(labelParams *LabelParams) error {
+	out, err := vipsLabel(r.image, labelParams)
 	if err != nil {
 		return err
 	}
@@ -1161,16 +1209,6 @@ func (r *ImageRef) Xyz2Yxy(options ...*Option) error {
 // Yxy2Xyz executes the 'Yxy2XYZ' operation
 func (r *ImageRef) Yxy2Xyz(options ...*Option) error {
 	out, err := Yxy2Xyz(r.image, options...)
-	if err != nil {
-		return err
-	}
-	r.setImage(out)
-	return nil
-}
-
-// Zoom executes the 'zoom' operation
-func (r *ImageRef) Zoom(xfac int, yfac int, options ...*Option) error {
-	out, err := Zoom(r.image, xfac, yfac, options...)
 	if err != nil {
 		return err
 	}

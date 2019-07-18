@@ -4,6 +4,10 @@ package vips
 // #include "vips/vips.h"
 import "C"
 
+// todo: move to bridge
+// todo: replace with direct C.<method> invocation
+// todo: make all private, callable from ImageRef
+
 // Abs executes the 'abs' operation
 func Abs(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
@@ -549,22 +553,23 @@ func Dzsave(in *C.VipsImage, filename string, options ...*Option) error {
 	return err
 }
 
-// Embed executes the 'embed' operation
-func Embed(in *C.VipsImage, x int, y int, width int, height int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputInt("x", x),
-		InputInt("y", y),
-		InputInt("width", width),
-		InputInt("height", height),
-		OutputImage("out", &out),
-	)
-	incOpCounter("embed")
-	err = vipsCall("embed", options)
-	return out, err
-}
+//
+//// Embed executes the 'embed' operation
+//func Embed(in *C.VipsImage, x int, y int, width int, height int, options ...*Option) (*C.VipsImage, error) {
+//	var out *C.VipsImage
+//	var err error
+//	options = append(options,
+//		InputImage("in", in),
+//		InputInt("x", x),
+//		InputInt("y", y),
+//		InputInt("width", width),
+//		InputInt("height", height),
+//		OutputImage("out", &out),
+//	)
+//	incOpCounter("embed")
+//	err = vipsCall("embed", options)
+//	return out, err
+//}
 
 // ExtractArea executes the 'extract_area' operation
 func ExtractArea(input *C.VipsImage, left int, top int, width int, height int, options ...*Option) (*C.VipsImage, error) {
@@ -684,18 +689,18 @@ func Flatten(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 }
 
 // Flip executes the 'flip' operation
-func Flip(in *C.VipsImage, direction Direction, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputInt("direction", int(direction)),
-		OutputImage("out", &out),
-	)
-	incOpCounter("flip")
-	err = vipsCall("flip", options)
-	return out, err
-}
+//func Flip(in *C.VipsImage, direction Direction, options ...*Option) (*C.VipsImage, error) {
+//	var out *C.VipsImage
+//	var err error
+//	options = append(options,
+//		InputImage("in", in),
+//		InputInt("direction", int(direction)),
+//		OutputImage("out", &out),
+//	)
+//	incOpCounter("flip")
+//	err = vipsCall("flip", options)
+//	return out, err
+//}
 
 // Float2Rad executes the 'float2rad' operation
 func Float2Rad(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
@@ -2188,21 +2193,22 @@ func Replicate(in *C.VipsImage, across int, down int, options ...*Option) (*C.Vi
 	return out, err
 }
 
-// Resize executes the 'resize' operation
-func Resize(in *C.VipsImage, scale float64, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputDouble("scale", scale),
-		OutputImage("out", &out),
-	)
-	incOpCounter("resize")
-	err = vipsCall("resize", options)
-	return out, err
-}
+//
+//// Resize executes the 'resize' operation
+//func Resize(in *C.VipsImage, scale float64, options ...*Option) (*C.VipsImage, error) {
+//	var out *C.VipsImage
+//	var err error
+//	options = append(options,
+//		InputImage("in", in),
+//		InputDouble("scale", scale),
+//		OutputImage("out", &out),
+//	)
+//	incOpCounter("resize")
+//	err = vipsCall("resize", options)
+//	return out, err
+//}
 
-// Rot executes the 'rot' operation
+// Rotate executes the 'rot' operation
 func Rot(in *C.VipsImage, angle Angle, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
 	var err error
@@ -2216,7 +2222,7 @@ func Rot(in *C.VipsImage, angle Angle, options ...*Option) (*C.VipsImage, error)
 	return out, err
 }
 
-// Rot45 executes the 'rot45' operation
+// Rotate45 executes the 'rot45' operation
 func Rot45(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
 	var err error
@@ -2816,16 +2822,16 @@ func Zone(width int, height int, options ...*Option) (*C.VipsImage, error) {
 }
 
 // Zoom executes the 'zoom' operation
-func Zoom(input *C.VipsImage, xfac int, yfac int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("input", input),
-		InputInt("xfac", xfac),
-		InputInt("yfac", yfac),
-		OutputImage("out", &out),
-	)
-	incOpCounter("zoom")
-	err = vipsCall("zoom", options)
-	return out, err
-}
+//func Zoom(input *C.VipsImage, xfac int, yfac int, options ...*Option) (*C.VipsImage, error) {
+//	var out *C.VipsImage
+//	var err error
+//	options = append(options,
+//		InputImage("input", input),
+//		InputInt("xfac", xfac),
+//		InputInt("yfac", yfac),
+//		OutputImage("out", &out),
+//	)
+//	incOpCounter("zoom")
+//	err = vipsCall("zoom", options)
+//	return out, err
+//}

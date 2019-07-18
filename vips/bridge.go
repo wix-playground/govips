@@ -290,17 +290,38 @@ func vipsFlattenBackground(input *C.VipsImage, color Color) (*C.VipsImage, error
 	return input, nil
 }
 
-func vipsResize(input *C.VipsImage, scale, vscale float64, kernel Kernel) (*C.VipsImage, error) {
+// Resize executes the 'resize' operation
+func vipsResize(in *C.VipsImage, scale, vscale float64, kernel Kernel) (*C.VipsImage, error) {
 	incOpCounter("resize")
-	var output *C.VipsImage
+	var out *C.VipsImage
 
 	// Let's not be insane
 	scale = math.Min(scale, maxScaleFactor)
 	vscale = math.Min(vscale, maxScaleFactor)
 
-	defer unrefImage(input)
+	if err := C.resize_image(in, &out, C.double(scale), C.double(vscale), C.int(kernel)); err != 0 {
+		return nil, handleVipsError()
+	}
 
-	if err := C.resize_image(input, &output, C.double(scale), C.double(vscale), C.int(kernel)); err != 0 {
+	return out, nil
+}
+
+func vipsEmbed(input *C.VipsImage, left, top, width, height int, extend ExtendStrategy) (*C.VipsImage, error) {
+	incOpCounter("embed")
+	var output *C.VipsImage
+
+	if err := C.embed_image(input, &output, C.int(left), C.int(top), C.int(width), C.int(height), C.int(extend), 0, 0, 0); err != 0 {
+		return nil, handleVipsError()
+	}
+
+	return output, nil
+}
+
+func vipsZoom(input *C.VipsImage, xFactor, yFactor int) (*C.VipsImage, error) {
+	incOpCounter("zoom")
+	var output *C.VipsImage
+
+	if err := C.zoom_image(input, &output, C.int(xFactor), C.int(yFactor)); err != 0 {
 		return nil, handleVipsError()
 	}
 
@@ -310,8 +331,6 @@ func vipsResize(input *C.VipsImage, scale, vscale float64, kernel Kernel) (*C.Vi
 func vipsRotate(input *C.VipsImage, angle Angle) (*C.VipsImage, error) {
 	incOpCounter("rot")
 	var output *C.VipsImage
-
-	defer unrefImage(input)
 
 	if err := C.rot_image(input, &output, C.VipsAngle(angle)); err != 0 {
 		return nil, handleVipsError()
@@ -426,24 +445,9 @@ func vipsExtractArea(input *C.VipsImage, left, top, width, height int) (*C.VipsI
 	return output, nil
 }
 
-func vipsEmbed(input *C.VipsImage, left, top, width, height int, extend Extend) (*C.VipsImage, error) {
-	incOpCounter("embed")
-	var output *C.VipsImage
-
-	defer unrefImage(input)
-
-	if err := C.embed_image(input, &output, C.int(left), C.int(top), C.int(width), C.int(height), C.int(extend), 0, 0, 0); err != 0 {
-		return nil, handleVipsError()
-	}
-
-	return output, nil
-}
-
 func vipsFlip(input *C.VipsImage, dir Direction) (*C.VipsImage, error) {
 	incOpCounter("flip")
 	var output *C.VipsImage
-
-	defer unrefImage(input)
 
 	if err := C.flip_image(input, &output, C.int(dir)); err != 0 {
 		return nil, handleVipsError()
@@ -456,8 +460,6 @@ func vipsInvert(input *C.VipsImage) (*C.VipsImage, error) {
 	incOpCounter("invert")
 	var output *C.VipsImage
 
-	defer unrefImage(input)
-
 	if err := C.invert_image(input, &output); err != 0 {
 		return nil, handleVipsError()
 	}
@@ -469,8 +471,6 @@ func vipsGaussianBlur(input *C.VipsImage, sigma float64) (*C.VipsImage, error) {
 	incOpCounter("gaussblur")
 	var output *C.VipsImage
 
-	defer unrefImage(input)
-
 	if err := C.gaussian_blur(input, &output, C.double(sigma)); err != 0 {
 		return nil, handleVipsError()
 	}
@@ -478,36 +478,21 @@ func vipsGaussianBlur(input *C.VipsImage, sigma float64) (*C.VipsImage, error) {
 	return output, nil
 }
 
-func vipsZoom(input *C.VipsImage, xFactor, yFactor int) (*C.VipsImage, error) {
-	incOpCounter("zoom")
-	var output *C.VipsImage
-
-	defer unrefImage(input)
-
-	if err := C.zoom_image(input, &output, C.int(xFactor), C.int(yFactor)); err != 0 {
-		return nil, handleVipsError()
-	}
-
-	return output, nil
-}
-
-func vipsLabel(input *C.VipsImage, lp LabelParams) (*C.VipsImage, error) {
+func vipsLabel(input *C.VipsImage, params *LabelParams) (*C.VipsImage, error) {
 	incOpCounter("label")
 	var output *C.VipsImage
 
-	defer unrefImage(input)
-
-	text := C.CString(lp.Text)
+	text := C.CString(params.Text)
 	defer freeCString(text)
 
-	font := C.CString(lp.Font)
+	font := C.CString(params.Font)
 	defer freeCString(font)
 
-	color := [3]C.double{C.double(lp.Color.R), C.double(lp.Color.G), C.double(lp.Color.B)}
-	w := lp.Width.GetRounded(int(input.Xsize))
-	h := lp.Height.GetRounded(int(input.Ysize))
-	offsetX := lp.OffsetX.GetRounded(int(input.Xsize))
-	offsetY := lp.OffsetY.GetRounded(int(input.Ysize))
+	color := [3]C.double{C.double(params.Color.R), C.double(params.Color.G), C.double(params.Color.B)}
+	w := params.Width.GetRounded(int(input.Xsize))
+	h := params.Height.GetRounded(int(input.Ysize))
+	offsetX := params.OffsetX.GetRounded(int(input.Xsize))
+	offsetY := params.OffsetY.GetRounded(int(input.Ysize))
 
 	opts := vipsLabelOptions{
 		Text:      text,
@@ -516,8 +501,8 @@ func vipsLabel(input *C.VipsImage, lp LabelParams) (*C.VipsImage, error) {
 		Height:    C.int(h),
 		OffsetX:   C.int(offsetX),
 		OffsetY:   C.int(offsetY),
-		Alignment: C.VipsAlign(lp.Alignment),
-		Opacity:   C.float(lp.Opacity),
+		Alignment: C.VipsAlign(params.Alignment),
+		Opacity:   C.float(params.Opacity),
 		Color:     color,
 	}
 
