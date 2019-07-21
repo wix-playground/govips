@@ -3,21 +3,6 @@ package vips
 // #cgo pkg-config: vips
 // #include "bridge.h"
 import "C"
-import (
-	"strings"
-	"sync"
-)
-
-// ResizeStrategy is the strategy to use when resizing an image
-type ResizeStrategy int
-
-// ResizeStrategy enum
-const (
-	ResizeStrategyAuto ResizeStrategy = iota
-	ResizeStrategyEmbed
-	ResizeStrategyCrop
-	ResizeStrategyStretch
-)
 
 // ExportParams are options when exporting an image to file or buffer
 type ExportParams struct {
@@ -56,34 +41,6 @@ type LabelParams struct {
 	Alignment Align
 }
 
-// Anchor represents the an anchor for cropping and other image operations
-type Anchor int
-
-// Anchor enum
-const (
-	AnchorAuto Anchor = iota
-	AnchorCenter
-	AnchorTop
-	AnchorTopRight
-	AnchorTopLeft
-	AnchorRight
-	AnchorBottom
-	AnchorBottomLeft
-	AnchorBottomRight
-	AnchorLeft
-)
-
-// FlipDirection represents the direction to flip
-type FlipDirection int
-
-// Flip enum
-const (
-	FlipNone FlipDirection = iota
-	FlipHorizontal
-	FlipVertical
-	FlipBoth
-)
-
 // ImageType represents an image type
 type ImageType int
 
@@ -120,19 +77,6 @@ func (i ImageType) OutputExt() string {
 	}
 	return ""
 }
-
-// Kernel represents VipsKernel type
-type Kernel int
-
-// Kernel enum
-const (
-	KernelAuto     Kernel = -1
-	KernelNearest  Kernel = C.VIPS_KERNEL_NEAREST
-	KernelLinear   Kernel = C.VIPS_KERNEL_LINEAR
-	KernelCubic    Kernel = C.VIPS_KERNEL_CUBIC
-	KernelLanczos2 Kernel = C.VIPS_KERNEL_LANCZOS2
-	KernelLanczos3 Kernel = C.VIPS_KERNEL_LANCZOS3
-)
 
 // Interpolator represents the vips interpolator types
 type Interpolator string
@@ -260,41 +204,6 @@ const (
 	AlignHigh   Align = C.VIPS_ALIGN_HIGH
 )
 
-// Direction represents VIPS_DIRECTION type
-type Direction int
-
-// Direction enum
-const (
-	DirectionHorizontal Direction = C.VIPS_DIRECTION_HORIZONTAL
-	DirectionVertical   Direction = C.VIPS_DIRECTION_VERTICAL
-)
-
-// Angle represents VIPS_ANGLE type
-type Angle int
-
-// Angle enum
-const (
-	Angle0   Angle = C.VIPS_ANGLE_D0
-	Angle90  Angle = C.VIPS_ANGLE_D90
-	Angle180 Angle = C.VIPS_ANGLE_D180
-	Angle270 Angle = C.VIPS_ANGLE_D270
-)
-
-// Angle45 represents VIPS_ANGLE45 type
-type Angle45 int
-
-// Angle45 enum
-const (
-	Angle45_0   Angle45 = C.VIPS_ANGLE45_D0
-	Angle45_45  Angle45 = C.VIPS_ANGLE45_D45
-	Angle45_90  Angle45 = C.VIPS_ANGLE45_D90
-	Angle45_135 Angle45 = C.VIPS_ANGLE45_D135
-	Angle45_180 Angle45 = C.VIPS_ANGLE45_D180
-	Angle45_225 Angle45 = C.VIPS_ANGLE45_D225
-	Angle45_270 Angle45 = C.VIPS_ANGLE45_D270
-	Angle45_315 Angle45 = C.VIPS_ANGLE45_D315
-)
-
 // Interpretation represents VIPS_INTERPRETATION type
 type Interpretation int
 
@@ -351,16 +260,6 @@ const (
 	CodingRAD   Coding = C.VIPS_CODING_RAD
 )
 
-// Access represents VIPS_ACCESS
-type Access int
-
-// Access enum
-const (
-	AccessRandom               Access = C.VIPS_ACCESS_RANDOM
-	AccessSequential           Access = C.VIPS_ACCESS_SEQUENTIAL
-	AccessSequentialUnbuffered Access = C.VIPS_ACCESS_SEQUENTIAL_UNBUFFERED
-)
-
 // OperationMorphology represents VIPS_OPERATION_MORPHOLOGY
 type OperationMorphology int
 
@@ -387,36 +286,6 @@ type Composite struct {
 	BlendMode BlendMode
 }
 
-type BlendMode int
-
-const (
-	BlendModeClear      BlendMode = C.VIPS_BLEND_MODE_CLEAR
-	BlendModeSource     BlendMode = C.VIPS_BLEND_MODE_SOURCE
-	BlendModeOver       BlendMode = C.VIPS_BLEND_MODE_OVER
-	BlendModeIn         BlendMode = C.VIPS_BLEND_MODE_IN
-	BlendModeOut        BlendMode = C.VIPS_BLEND_MODE_OUT
-	BlendModeAtop       BlendMode = C.VIPS_BLEND_MODE_ATOP
-	BlendModeDest       BlendMode = C.VIPS_BLEND_MODE_DEST
-	BlendModeDestOver   BlendMode = C.VIPS_BLEND_MODE_DEST_OVER
-	BlendModeDestIn     BlendMode = C.VIPS_BLEND_MODE_DEST_IN
-	BlendModeDestOut    BlendMode = C.VIPS_BLEND_MODE_DEST_OUT
-	BlendModeDestAtop   BlendMode = C.VIPS_BLEND_MODE_DEST_ATOP
-	BlendModeXOR        BlendMode = C.VIPS_BLEND_MODE_XOR
-	BlendModeAdd        BlendMode = C.VIPS_BLEND_MODE_ADD
-	BlendModeSaturate   BlendMode = C.VIPS_BLEND_MODE_SATURATE
-	BlendModeMultiply   BlendMode = C.VIPS_BLEND_MODE_MULTIPLY
-	BlendModeScreen     BlendMode = C.VIPS_BLEND_MODE_SCREEN
-	BlendModeOverlay    BlendMode = C.VIPS_BLEND_MODE_OVERLAY
-	BlendModeDarken     BlendMode = C.VIPS_BLEND_MODE_DARKEN
-	BlendModeLighten    BlendMode = C.VIPS_BLEND_MODE_LIGHTEN
-	BlendModeColorDodge BlendMode = C.VIPS_BLEND_MODE_COLOUR_DODGE
-	BlendModeColorBurn  BlendMode = C.VIPS_BLEND_MODE_COLOUR_BURN
-	BlendModeHardLight  BlendMode = C.VIPS_BLEND_MODE_HARD_LIGHT
-	BlendModeSoftLight  BlendMode = C.VIPS_BLEND_MODE_SOFT_LIGHT
-	BlendModeDifference BlendMode = C.VIPS_BLEND_MODE_DIFFERENCE
-	BlendModeExclusion  BlendMode = C.VIPS_BLEND_MODE_EXCLUSION
-)
-
 // Size represents VIPS_SIZE type
 type Size int
 
@@ -428,42 +297,3 @@ const (
 	SizeForce Size = C.VIPS_SIZE_FORCE
 	SizeLast  Size = C.VIPS_SIZE_LAST
 )
-
-var (
-	once                sync.Once
-	typeLoaders         = make(map[string]ImageType)
-	supportedImageTypes = make(map[ImageType]bool)
-)
-
-// InitTypes initializes caches and figures out which image types are supported
-func initTypes() {
-	once.Do(func() {
-		cType := C.CString("VipsOperation")
-		defer freeCString(cType)
-
-		for k, v := range ImageTypes {
-			name := strings.ToLower("VipsForeignLoad" + v)
-			typeLoaders[name] = k
-			typeLoaders[name+"buffer"] = k
-
-			cFunc := C.CString(v + "load")
-			//noinspection GoDeferInLoop
-			defer freeCString(cFunc)
-
-			ret := C.vips_type_find(cType, cFunc)
-
-			supportedImageTypes[k] = int(ret) != 0
-
-			info("Registered image type loader type=%s", v)
-		}
-	})
-}
-
-// DetermineImageType attempts to determine the image type of the given buffer
-func DetermineImageType(buf []byte) ImageType {
-	return vipsDetermineImageType(buf)
-}
-
-func IsTypeSupported(imageType ImageType) bool {
-	return supportedImageTypes[imageType]
-}

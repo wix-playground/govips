@@ -1,7 +1,7 @@
 package vips
 
 // #cgo pkg-config: vips
-// #include "bridge.h"
+// #include "image.h"
 import "C"
 
 import (
@@ -10,6 +10,11 @@ import (
 	"io/ioutil"
 	"runtime"
 	"unsafe"
+)
+
+const (
+	defaultQuality     = 90
+	defaultCompression = 6
 )
 
 // ImageRef contains a libvips image and manages its lifecycle. You should
@@ -30,48 +35,31 @@ type ImageMetadata struct {
 	Height int
 }
 
-type LoadOption func(o *vipsLoadOptions)
-
-func WithAccessMode(a Access) LoadOption {
-	return func(o *vipsLoadOptions) {
-		switch a {
-		case AccessRandom:
-			o.cOpts.access = C.VIPS_ACCESS_RANDOM
-		case AccessSequential:
-			o.cOpts.access = C.VIPS_ACCESS_SEQUENTIAL
-		case AccessSequentialUnbuffered:
-			o.cOpts.access = C.VIPS_ACCESS_SEQUENTIAL_UNBUFFERED
-		default:
-			o.cOpts.access = C.VIPS_ACCESS_RANDOM
-		}
-	}
-}
-
 // NewImageFromReader loads an ImageRef from the given reader
-func NewImageFromReader(r io.Reader, opts ...LoadOption) (*ImageRef, error) {
+func NewImageFromReader(r io.Reader) (*ImageRef, error) {
 	buf, err := ioutil.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}
 
-	return NewImageFromBuffer(buf, opts...)
+	return NewImageFromBuffer(buf)
 }
 
 // NewImageFromFile loads an image from file and creates a new ImageRef
-func NewImageFromFile(file string, opts ...LoadOption) (*ImageRef, error) {
+func NewImageFromFile(file string) (*ImageRef, error) {
 	buf, err := ioutil.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}
 
-	return NewImageFromBuffer(buf, opts...)
+	return NewImageFromBuffer(buf)
 }
 
 // NewImageFromBuffer loads an image buffer and creates a new Image
-func NewImageFromBuffer(buf []byte, opts ...LoadOption) (*ImageRef, error) {
+func NewImageFromBuffer(buf []byte) (*ImageRef, error) {
 	startupIfNeeded()
 
-	image, format, err := vipsLoadFromBuffer(buf, opts...)
+	image, format, err := vipsLoadFromBuffer(buf)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +77,6 @@ func (r *ImageRef) Metadata() *ImageMetadata {
 	}
 }
 
-// https://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-copy
 // create a new ref
 func (r *ImageRef) Copy(options ...*Option) (*ImageRef, error) {
 	out, err := vipsCopyImage(r.image)
@@ -217,9 +204,8 @@ func (r *ImageRef) Export(params *ExportParams) ([]byte, *ImageMetadata, error) 
 	return buf, metadata, nil
 }
 
-// compose images
-func (r *ImageRef) Composite(overlay *ImageRef, mode BlendMode) error {
-	out, err := vipsComposite([]*C.VipsImage{r.image, overlay.image}, mode)
+func (r *ImageRef) Composite(overlay *ImageRef, mode BlendMode, x, y int) error {
+	out, err := vipsComposite2(r.image, overlay, mode, x, y)
 	if err != nil {
 		return err
 	}
@@ -434,8 +420,8 @@ func (r *ImageRef) FillNearest(options ...*Option) error {
 }
 
 // Flatten executes the 'flatten' operation
-func (r *ImageRef) Flatten(options ...*Option) error {
-	out, err := Flatten(r.image, options...)
+func (r *ImageRef) Flatten(backgroundColor *Color) error {
+	out, err := vipsFlatten(r.image, backgroundColor)
 	if err != nil {
 		return err
 	}
@@ -884,8 +870,18 @@ func (r *ImageRef) Replicate(across int, down int, options ...*Option) error {
 }
 
 // Resize executes the 'resize' operation
-func (r *ImageRef) Resize(scale float64, vscale float64, kernel Kernel) error {
-	out, err := vipsResize(r.image, scale, vscale, kernel)
+func (r *ImageRef) Resize(scale float64, kernel Kernel) error {
+	out, err := vipsResize(r.image, scale, kernel)
+	if err != nil {
+		return err
+	}
+	r.setImage(out)
+	return nil
+}
+
+// Resize executes the 'resize' operation
+func (r *ImageRef) ResizeWithVScale(hScale, vScale float64, kernel Kernel) error {
+	out, err := vipsResizeWithVScale(r.image, hScale, vScale, kernel)
 	if err != nil {
 		return err
 	}
@@ -1264,4 +1260,10 @@ func (r *ImageRef) setImage(image *C.VipsImage) {
 	}
 
 	r.image = image
+}
+
+///////////////
+
+func vipsHasAlpha(in *C.VipsImage) bool {
+	return int(C.has_alpha_channel(in)) > 0
 }

@@ -1,7 +1,7 @@
 package vips
 
 // #cgo pkg-config: vips
-// #include "vips/vips.h"
+// #include "bridge.h"
 import "C"
 
 // todo: move to bridge
@@ -101,35 +101,6 @@ func Bandunfold(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	return out, err
 }
 
-// Black executes the 'black' operation
-func Black(width int, height int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		OutputImage("out", &out),
-	)
-	incOpCounter("black")
-	err = vipsCall("black", options)
-	return out, err
-}
-
-// Boolean executes the 'boolean' operation
-func Boolean(left *C.VipsImage, right *C.VipsImage, boolean OperationBoolean, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("left", left),
-		InputImage("right", right),
-		InputInt("boolean", int(boolean)),
-		OutputImage("out", &out),
-	)
-	incOpCounter("boolean")
-	err = vipsCall("boolean", options)
-	return out, err
-}
-
 // Buildlut executes the 'buildlut' operation
 func Buildlut(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
@@ -210,20 +181,6 @@ func Colourspace(in *C.VipsImage, space Interpretation, options ...*Option) (*C.
 	return out, err
 }
 
-// Compass executes the 'compass' operation
-func Compass(in *C.VipsImage, mask *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("mask", mask),
-		OutputImage("out", &out),
-	)
-	incOpCounter("compass")
-	err = vipsCall("compass", options)
-	return out, err
-}
-
 // Complex executes the 'complex' operation
 func Complex(in *C.VipsImage, cmplx OperationComplex, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
@@ -235,35 +192,6 @@ func Complex(in *C.VipsImage, cmplx OperationComplex, options ...*Option) (*C.Vi
 	)
 	incOpCounter("complex")
 	err = vipsCall("complex", options)
-	return out, err
-}
-
-// Complex2 executes the 'complex2' operation
-func Complex2(left *C.VipsImage, right *C.VipsImage, cmplx OperationComplex2, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("left", left),
-		InputImage("right", right),
-		InputInt("cmplx", int(cmplx)),
-		OutputImage("out", &out),
-	)
-	incOpCounter("complex2")
-	err = vipsCall("complex2", options)
-	return out, err
-}
-
-// Complexform executes the 'complexform' operation
-func Complexform(left *C.VipsImage, right *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("left", left),
-		InputImage("right", right),
-		OutputImage("out", &out),
-	)
-	incOpCounter("complexform")
-	err = vipsCall("complexform", options)
 	return out, err
 }
 
@@ -281,242 +209,6 @@ func Complexget(in *C.VipsImage, get OperationComplexGet, options ...*Option) (*
 	return out, err
 }
 
-// Conv executes the 'conv' operation
-func Conv(in *C.VipsImage, mask *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("mask", mask),
-		OutputImage("out", &out),
-	)
-	incOpCounter("conv")
-	err = vipsCall("conv", options)
-	return out, err
-}
-
-// Conva executes the 'conva' operation
-func Conva(in *C.VipsImage, mask *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("mask", mask),
-		OutputImage("out", &out),
-	)
-	incOpCounter("conva")
-	err = vipsCall("conva", options)
-	return out, err
-}
-
-// Convasep executes the 'convasep' operation
-func Convasep(in *C.VipsImage, mask *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("mask", mask),
-		OutputImage("out", &out),
-	)
-	incOpCounter("convasep")
-	err = vipsCall("convasep", options)
-	return out, err
-}
-
-// Convf executes the 'convf' operation
-func Convf(in *C.VipsImage, mask *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("mask", mask),
-		OutputImage("out", &out),
-	)
-	incOpCounter("convf")
-	err = vipsCall("convf", options)
-	return out, err
-}
-
-// Convi executes the 'convi' operation
-func Convi(in *C.VipsImage, mask *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("mask", mask),
-		OutputImage("out", &out),
-	)
-	incOpCounter("convi")
-	err = vipsCall("convi", options)
-	return out, err
-}
-
-// Convsep executes the 'convsep' operation
-func Convsep(in *C.VipsImage, mask *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("mask", mask),
-		OutputImage("out", &out),
-	)
-	incOpCounter("convsep")
-	err = vipsCall("convsep", options)
-	return out, err
-}
-
-// Countlines executes the 'countlines' operation
-func Countlines(in *C.VipsImage, direction Direction, options ...*Option) (float64, error) {
-	var nolines float64
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputInt("direction", int(direction)),
-		OutputDouble("nolines", &nolines),
-	)
-	incOpCounter("countlines")
-	err = vipsCall("countlines", options)
-	return nolines, err
-}
-
-// De00 executes the 'dE00' operation
-func De00(left *C.VipsImage, right *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("left", left),
-		InputImage("right", right),
-		OutputImage("out", &out),
-	)
-	incOpCounter("dE00")
-	err = vipsCall("dE00", options)
-	return out, err
-}
-
-// De76 executes the 'dE76' operation
-func De76(left *C.VipsImage, right *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("left", left),
-		InputImage("right", right),
-		OutputImage("out", &out),
-	)
-	incOpCounter("dE76")
-	err = vipsCall("dE76", options)
-	return out, err
-}
-
-// Decmc executes the 'dECMC' operation
-func Decmc(left *C.VipsImage, right *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("left", left),
-		InputImage("right", right),
-		OutputImage("out", &out),
-	)
-	incOpCounter("dECMC")
-	err = vipsCall("dECMC", options)
-	return out, err
-}
-
-// Deviate executes the 'deviate' operation
-func Deviate(in *C.VipsImage, options ...*Option) (float64, error) {
-	var out float64
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		OutputDouble("out", &out),
-	)
-	incOpCounter("deviate")
-	err = vipsCall("deviate", options)
-	return out, err
-}
-
-// Divide executes the 'divide' operation
-func Divide(left *C.VipsImage, right *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("left", left),
-		InputImage("right", right),
-		OutputImage("out", &out),
-	)
-	incOpCounter("divide")
-	err = vipsCall("divide", options)
-	return out, err
-}
-
-// DrawImage executes the 'draw_image' operation
-func DrawImage(image *C.VipsImage, sub *C.VipsImage, x int, y int, options ...*Option) error {
-	var err error
-	options = append(options,
-		InputImage("image", image),
-		InputImage("sub", sub),
-		InputInt("x", x),
-		InputInt("y", y),
-	)
-	incOpCounter("draw_image")
-	err = vipsCall("draw_image", options)
-	return err
-}
-
-// DrawSmudge executes the 'draw_smudge' operation
-func DrawSmudge(image *C.VipsImage, left int, top int, width int, height int, options ...*Option) error {
-	var err error
-	options = append(options,
-		InputImage("image", image),
-		InputInt("left", left),
-		InputInt("top", top),
-		InputInt("width", width),
-		InputInt("height", height),
-	)
-	incOpCounter("draw_smudge")
-	err = vipsCall("draw_smudge", options)
-	return err
-}
-
-// Dzsave executes the 'dzsave' operation
-func Dzsave(in *C.VipsImage, filename string, options ...*Option) error {
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputString("filename", filename),
-	)
-	incOpCounter("dzsave")
-	err = vipsCall("dzsave", options)
-	return err
-}
-
-// ExtractBand executes the 'extract_band' operation
-func ExtractBand(in *C.VipsImage, band int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputInt("band", band),
-		OutputImage("out", &out),
-	)
-	incOpCounter("extract_band")
-	err = vipsCall("extract_band", options)
-	return out, err
-}
-
-// Eye executes the 'eye' operation
-func Eye(width int, height int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		OutputImage("out", &out),
-	)
-	incOpCounter("eye")
-	err = vipsCall("eye", options)
-	return out, err
-}
-
 // Falsecolour executes the 'falsecolour' operation
 func Falsecolour(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
@@ -527,20 +219,6 @@ func Falsecolour(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	)
 	incOpCounter("falsecolour")
 	err = vipsCall("falsecolour", options)
-	return out, err
-}
-
-// Fastcor executes the 'fastcor' operation
-func Fastcor(in *C.VipsImage, ref *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("ref", ref),
-		OutputImage("out", &out),
-	)
-	incOpCounter("fastcor")
-	err = vipsCall("fastcor", options)
 	return out, err
 }
 
@@ -557,38 +235,6 @@ func FillNearest(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	return out, err
 }
 
-// FindTrim executes the 'find_trim' operation
-func FindTrim(in *C.VipsImage, options ...*Option) (int, int, int, int, error) {
-	var left int
-	var top int
-	var width int
-	var height int
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		OutputInt("left", &left),
-		OutputInt("top", &top),
-		OutputInt("width", &width),
-		OutputInt("height", &height),
-	)
-	incOpCounter("find_trim")
-	err = vipsCall("find_trim", options)
-	return left, top, width, height, err
-}
-
-// Flatten executes the 'flatten' operation
-func Flatten(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		OutputImage("out", &out),
-	)
-	incOpCounter("flatten")
-	err = vipsCall("flatten", options)
-	return out, err
-}
-
 // Float2Rad executes the 'float2rad' operation
 func Float2Rad(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
@@ -599,35 +245,6 @@ func Float2Rad(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	)
 	incOpCounter("float2rad")
 	err = vipsCall("float2rad", options)
-	return out, err
-}
-
-// Fractsurf executes the 'fractsurf' operation
-func Fractsurf(width int, height int, fractalDimension float64, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		InputDouble("fractal-dimension", fractalDimension),
-		OutputImage("out", &out),
-	)
-	incOpCounter("fractsurf")
-	err = vipsCall("fractsurf", options)
-	return out, err
-}
-
-// Freqmult executes the 'freqmult' operation
-func Freqmult(in *C.VipsImage, mask *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("mask", mask),
-		OutputImage("out", &out),
-	)
-	incOpCounter("freqmult")
-	err = vipsCall("freqmult", options)
 	return out, err
 }
 
@@ -657,34 +274,6 @@ func Gamma(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	return out, err
 }
 
-// Gaussmat executes the 'gaussmat' operation
-func Gaussmat(sigma float64, minAmpl float64, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputDouble("sigma", sigma),
-		InputDouble("min-ampl", minAmpl),
-		OutputImage("out", &out),
-	)
-	incOpCounter("gaussmat")
-	err = vipsCall("gaussmat", options)
-	return out, err
-}
-
-// Gaussnoise executes the 'gaussnoise' operation
-func Gaussnoise(width int, height int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		OutputImage("out", &out),
-	)
-	incOpCounter("gaussnoise")
-	err = vipsCall("gaussnoise", options)
-	return out, err
-}
-
 // Globalbalance executes the 'globalbalance' operation
 func Globalbalance(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
@@ -695,20 +284,6 @@ func Globalbalance(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	)
 	incOpCounter("globalbalance")
 	err = vipsCall("globalbalance", options)
-	return out, err
-}
-
-// Grey executes the 'grey' operation
-func Grey(width int, height int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		OutputImage("out", &out),
-	)
-	incOpCounter("grey")
-	err = vipsCall("grey", options)
 	return out, err
 }
 
@@ -741,19 +316,6 @@ func HistCum(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	return out, err
 }
 
-// HistEntropy executes the 'hist_entropy' operation
-func HistEntropy(in *C.VipsImage, options ...*Option) (float64, error) {
-	var out float64
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		OutputDouble("out", &out),
-	)
-	incOpCounter("hist_entropy")
-	err = vipsCall("hist_entropy", options)
-	return out, err
-}
-
 // HistEqual executes the 'hist_equal' operation
 func HistEqual(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
@@ -780,20 +342,6 @@ func HistFind(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	return out, err
 }
 
-// HistFindIndexed executes the 'hist_find_indexed' operation
-func HistFindIndexed(in *C.VipsImage, index *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("index", index),
-		OutputImage("out", &out),
-	)
-	incOpCounter("hist_find_indexed")
-	err = vipsCall("hist_find_indexed", options)
-	return out, err
-}
-
 // HistFindNdim executes the 'hist_find_ndim' operation
 func HistFindNdim(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
@@ -805,19 +353,6 @@ func HistFindNdim(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	incOpCounter("hist_find_ndim")
 	err = vipsCall("hist_find_ndim", options)
 	return out, err
-}
-
-// HistIsmonotonic executes the 'hist_ismonotonic' operation
-func HistIsmonotonic(in *C.VipsImage, options ...*Option) (bool, error) {
-	var monotonic bool
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		OutputBool("monotonic", &monotonic),
-	)
-	incOpCounter("hist_ismonotonic")
-	err = vipsCall("hist_ismonotonic", options)
-	return monotonic, err
 }
 
 // HistLocal executes the 'hist_local' operation
@@ -832,20 +367,6 @@ func HistLocal(in *C.VipsImage, width int, height int, options ...*Option) (*C.V
 	)
 	incOpCounter("hist_local")
 	err = vipsCall("hist_local", options)
-	return out, err
-}
-
-// HistMatch executes the 'hist_match' operation
-func HistMatch(in *C.VipsImage, ref *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("ref", ref),
-		OutputImage("out", &out),
-	)
-	incOpCounter("hist_match")
-	err = vipsCall("hist_match", options)
 	return out, err
 }
 
@@ -954,63 +475,6 @@ func IccTransform(in *C.VipsImage, outputProfile string, options ...*Option) (*C
 	return out, err
 }
 
-// Identity executes the 'identity' operation
-func Identity(options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-
-		OutputImage("out", &out),
-	)
-	incOpCounter("identity")
-	err = vipsCall("identity", options)
-	return out, err
-}
-
-// Ifthenelse executes the 'ifthenelse' operation
-func Ifthenelse(cond *C.VipsImage, in1 *C.VipsImage, in2 *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("cond", cond),
-		InputImage("in1", in1),
-		InputImage("in2", in2),
-		OutputImage("out", &out),
-	)
-	incOpCounter("ifthenelse")
-	err = vipsCall("ifthenelse", options)
-	return out, err
-}
-
-// Insert executes the 'insert' operation
-func Insert(main *C.VipsImage, sub *C.VipsImage, x int, y int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("main", main),
-		InputImage("sub", sub),
-		InputInt("x", x),
-		InputInt("y", y),
-		OutputImage("out", &out),
-	)
-	incOpCounter("insert")
-	err = vipsCall("insert", options)
-	return out, err
-}
-
-// Invert executes the 'invert' operation
-func Invert(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		OutputImage("out", &out),
-	)
-	incOpCounter("invert")
-	err = vipsCall("invert", options)
-	return out, err
-}
-
 // Invertlut executes the 'invertlut' operation
 func Invertlut(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
@@ -1034,21 +498,6 @@ func Invfft(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	)
 	incOpCounter("invfft")
 	err = vipsCall("invfft", options)
-	return out, err
-}
-
-// Join executes the 'join' operation
-func Join(in1 *C.VipsImage, in2 *C.VipsImage, direction Direction, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in1", in1),
-		InputImage("in2", in2),
-		InputInt("direction", int(direction)),
-		OutputImage("out", &out),
-	)
-	incOpCounter("join")
-	err = vipsCall("join", options)
 	return out, err
 }
 
@@ -1221,238 +670,6 @@ func Linecache(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	return out, err
 }
 
-// Logmat executes the 'logmat' operation
-func Logmat(sigma float64, minAmpl float64, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputDouble("sigma", sigma),
-		InputDouble("min-ampl", minAmpl),
-		OutputImage("out", &out),
-	)
-	incOpCounter("logmat")
-	err = vipsCall("logmat", options)
-	return out, err
-}
-
-// Mapim executes the 'mapim' operation
-func Mapim(in *C.VipsImage, index *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("index", index),
-		OutputImage("out", &out),
-	)
-	incOpCounter("mapim")
-	err = vipsCall("mapim", options)
-	return out, err
-}
-
-// Maplut executes the 'maplut' operation
-func Maplut(in *C.VipsImage, lut *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("lut", lut),
-		OutputImage("out", &out),
-	)
-	incOpCounter("maplut")
-	err = vipsCall("maplut", options)
-	return out, err
-}
-
-// MaskButterworth executes the 'mask_butterworth' operation
-func MaskButterworth(width int, height int, order float64, frequencyCutoff float64, amplitudeCutoff float64, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		InputDouble("order", order),
-		InputDouble("frequency-cutoff", frequencyCutoff),
-		InputDouble("amplitude-cutoff", amplitudeCutoff),
-		OutputImage("out", &out),
-	)
-	incOpCounter("mask_butterworth")
-	err = vipsCall("mask_butterworth", options)
-	return out, err
-}
-
-// MaskButterworthBand executes the 'mask_butterworth_band' operation
-func MaskButterworthBand(width int, height int, order float64, frequencyCutoffx float64, frequencyCutoffy float64, radius float64, amplitudeCutoff float64, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		InputDouble("order", order),
-		InputDouble("frequency-cutoff-x", frequencyCutoffx),
-		InputDouble("frequency-cutoff-y", frequencyCutoffy),
-		InputDouble("radius", radius),
-		InputDouble("amplitude-cutoff", amplitudeCutoff),
-		OutputImage("out", &out),
-	)
-	incOpCounter("mask_butterworth_band")
-	err = vipsCall("mask_butterworth_band", options)
-	return out, err
-}
-
-// MaskButterworthRing executes the 'mask_butterworth_ring' operation
-func MaskButterworthRing(width int, height int, order float64, frequencyCutoff float64, amplitudeCutoff float64, ringwidth float64, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		InputDouble("order", order),
-		InputDouble("frequency-cutoff", frequencyCutoff),
-		InputDouble("amplitude-cutoff", amplitudeCutoff),
-		InputDouble("ringwidth", ringwidth),
-		OutputImage("out", &out),
-	)
-	incOpCounter("mask_butterworth_ring")
-	err = vipsCall("mask_butterworth_ring", options)
-	return out, err
-}
-
-// MaskFractal executes the 'mask_fractal' operation
-func MaskFractal(width int, height int, fractalDimension float64, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		InputDouble("fractal-dimension", fractalDimension),
-		OutputImage("out", &out),
-	)
-	incOpCounter("mask_fractal")
-	err = vipsCall("mask_fractal", options)
-	return out, err
-}
-
-// MaskGaussian executes the 'mask_gaussian' operation
-func MaskGaussian(width int, height int, frequencyCutoff float64, amplitudeCutoff float64, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		InputDouble("frequency-cutoff", frequencyCutoff),
-		InputDouble("amplitude-cutoff", amplitudeCutoff),
-		OutputImage("out", &out),
-	)
-	incOpCounter("mask_gaussian")
-	err = vipsCall("mask_gaussian", options)
-	return out, err
-}
-
-// MaskGaussianBand executes the 'mask_gaussian_band' operation
-func MaskGaussianBand(width int, height int, frequencyCutoffx float64, frequencyCutoffy float64, radius float64, amplitudeCutoff float64, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		InputDouble("frequency-cutoff-x", frequencyCutoffx),
-		InputDouble("frequency-cutoff-y", frequencyCutoffy),
-		InputDouble("radius", radius),
-		InputDouble("amplitude-cutoff", amplitudeCutoff),
-		OutputImage("out", &out),
-	)
-	incOpCounter("mask_gaussian_band")
-	err = vipsCall("mask_gaussian_band", options)
-	return out, err
-}
-
-// MaskGaussianRing executes the 'mask_gaussian_ring' operation
-func MaskGaussianRing(width int, height int, frequencyCutoff float64, amplitudeCutoff float64, ringwidth float64, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		InputDouble("frequency-cutoff", frequencyCutoff),
-		InputDouble("amplitude-cutoff", amplitudeCutoff),
-		InputDouble("ringwidth", ringwidth),
-		OutputImage("out", &out),
-	)
-	incOpCounter("mask_gaussian_ring")
-	err = vipsCall("mask_gaussian_ring", options)
-	return out, err
-}
-
-// MaskIdeal executes the 'mask_ideal' operation
-func MaskIdeal(width int, height int, frequencyCutoff float64, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		InputDouble("frequency-cutoff", frequencyCutoff),
-		OutputImage("out", &out),
-	)
-	incOpCounter("mask_ideal")
-	err = vipsCall("mask_ideal", options)
-	return out, err
-}
-
-// MaskIdealBand executes the 'mask_ideal_band' operation
-func MaskIdealBand(width int, height int, frequencyCutoffx float64, frequencyCutoffy float64, radius float64, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		InputDouble("frequency-cutoff-x", frequencyCutoffx),
-		InputDouble("frequency-cutoff-y", frequencyCutoffy),
-		InputDouble("radius", radius),
-		OutputImage("out", &out),
-	)
-	incOpCounter("mask_ideal_band")
-	err = vipsCall("mask_ideal_band", options)
-	return out, err
-}
-
-// MaskIdealRing executes the 'mask_ideal_ring' operation
-func MaskIdealRing(width int, height int, frequencyCutoff float64, ringwidth float64, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		InputDouble("frequency-cutoff", frequencyCutoff),
-		InputDouble("ringwidth", ringwidth),
-		OutputImage("out", &out),
-	)
-	incOpCounter("mask_ideal_ring")
-	err = vipsCall("mask_ideal_ring", options)
-	return out, err
-}
-
-// Match executes the 'match' operation
-func Match(ref *C.VipsImage, sec *C.VipsImage, xr1 int, yr1 int, xs1 int, ys1 int, xr2 int, yr2 int, xs2 int, ys2 int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("ref", ref),
-		InputImage("sec", sec),
-		InputInt("xr1", xr1),
-		InputInt("yr1", yr1),
-		InputInt("xs1", xs1),
-		InputInt("ys1", ys1),
-		InputInt("xr2", xr2),
-		InputInt("yr2", yr2),
-		InputInt("xs2", xs2),
-		InputInt("ys2", ys2),
-		OutputImage("out", &out),
-	)
-	incOpCounter("match")
-	err = vipsCall("match", options)
-	return out, err
-}
-
 // Math executes the 'math' operation
 func Math(in *C.VipsImage, math OperationMath, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
@@ -1464,70 +681,6 @@ func Math(in *C.VipsImage, math OperationMath, options ...*Option) (*C.VipsImage
 	)
 	incOpCounter("math")
 	err = vipsCall("math", options)
-	return out, err
-}
-
-// Math2 executes the 'math2' operation
-func Math2(left *C.VipsImage, right *C.VipsImage, math2 OperationMath2, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("left", left),
-		InputImage("right", right),
-		InputInt("math2", int(math2)),
-		OutputImage("out", &out),
-	)
-	incOpCounter("math2")
-	err = vipsCall("math2", options)
-	return out, err
-}
-
-// Matrixload executes the 'matrixload' operation
-func Matrixload(filename string, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputString("filename", filename),
-		OutputImage("out", &out),
-	)
-	incOpCounter("matrixload")
-	err = vipsCall("matrixload", options)
-	return out, err
-}
-
-// Matrixprint executes the 'matrixprint' operation
-func Matrixprint(in *C.VipsImage, options ...*Option) error {
-	var err error
-	options = append(options,
-		InputImage("in", in),
-	)
-	incOpCounter("matrixprint")
-	err = vipsCall("matrixprint", options)
-	return err
-}
-
-// Matrixsave executes the 'matrixsave' operation
-func Matrixsave(in *C.VipsImage, filename string, options ...*Option) error {
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputString("filename", filename),
-	)
-	incOpCounter("matrixsave")
-	err = vipsCall("matrixsave", options)
-	return err
-}
-
-// Max executes the 'max' operation
-func Max(in *C.VipsImage, options ...*Option) (float64, error) {
-	var out float64
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		OutputDouble("out", &out),
-	)
-	incOpCounter("max")
-	err = vipsCall("max", options)
 	return out, err
 }
 
@@ -1546,93 +699,6 @@ func Measure(in *C.VipsImage, h int, v int, options ...*Option) (*C.VipsImage, e
 	return out, err
 }
 
-// Merge executes the 'merge' operation
-func Merge(ref *C.VipsImage, sec *C.VipsImage, direction Direction, dx int, dy int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("ref", ref),
-		InputImage("sec", sec),
-		InputInt("direction", int(direction)),
-		InputInt("dx", dx),
-		InputInt("dy", dy),
-		OutputImage("out", &out),
-	)
-	incOpCounter("merge")
-	err = vipsCall("merge", options)
-	return out, err
-}
-
-// Min executes the 'min' operation
-func Min(in *C.VipsImage, options ...*Option) (float64, error) {
-	var out float64
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		OutputDouble("out", &out),
-	)
-	incOpCounter("min")
-	err = vipsCall("min", options)
-	return out, err
-}
-
-// Morph executes the 'morph' operation
-func Morph(in *C.VipsImage, mask *C.VipsImage, morph OperationMorphology, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("mask", mask),
-		InputInt("morph", int(morph)),
-		OutputImage("out", &out),
-	)
-	incOpCounter("morph")
-	err = vipsCall("morph", options)
-	return out, err
-}
-
-// Mosaic executes the 'mosaic' operation
-func Mosaic(ref *C.VipsImage, sec *C.VipsImage, direction Direction, xref int, yref int, xsec int, ysec int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("ref", ref),
-		InputImage("sec", sec),
-		InputInt("direction", int(direction)),
-		InputInt("xref", xref),
-		InputInt("yref", yref),
-		InputInt("xsec", xsec),
-		InputInt("ysec", ysec),
-		OutputImage("out", &out),
-	)
-	incOpCounter("mosaic")
-	err = vipsCall("mosaic", options)
-	return out, err
-}
-
-// Mosaic1 executes the 'mosaic1' operation
-func Mosaic1(ref *C.VipsImage, sec *C.VipsImage, direction Direction, xr1 int, yr1 int, xs1 int, ys1 int, xr2 int, yr2 int, xs2 int, ys2 int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("ref", ref),
-		InputImage("sec", sec),
-		InputInt("direction", int(direction)),
-		InputInt("xr1", xr1),
-		InputInt("yr1", yr1),
-		InputInt("xs1", xs1),
-		InputInt("ys1", ys1),
-		InputInt("xr2", xr2),
-		InputInt("yr2", yr2),
-		InputInt("xs2", xs2),
-		InputInt("ys2", ys2),
-		OutputImage("out", &out),
-	)
-	incOpCounter("mosaic1")
-	err = vipsCall("mosaic1", options)
-	return out, err
-}
-
 // Msb executes the 'msb' operation
 func Msb(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
@@ -1646,62 +712,6 @@ func Msb(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	return out, err
 }
 
-// Multiply executes the 'multiply' operation
-func Multiply(left *C.VipsImage, right *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("left", left),
-		InputImage("right", right),
-		OutputImage("out", &out),
-	)
-	incOpCounter("multiply")
-	err = vipsCall("multiply", options)
-	return out, err
-}
-
-// Percent executes the 'percent' operation
-func Percent(in *C.VipsImage, percent float64, options ...*Option) (int, error) {
-	var threshold int
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputDouble("percent", percent),
-		OutputInt("threshold", &threshold),
-	)
-	incOpCounter("percent")
-	err = vipsCall("percent", options)
-	return threshold, err
-}
-
-// Perlin executes the 'perlin' operation
-func Perlin(width int, height int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		OutputImage("out", &out),
-	)
-	incOpCounter("perlin")
-	err = vipsCall("perlin", options)
-	return out, err
-}
-
-// Phasecor executes the 'phasecor' operation
-func Phasecor(in *C.VipsImage, in2 *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("in2", in2),
-		OutputImage("out", &out),
-	)
-	incOpCounter("phasecor")
-	err = vipsCall("phasecor", options)
-	return out, err
-}
-
 // Premultiply executes the 'premultiply' operation
 func Premultiply(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
@@ -1712,50 +722,6 @@ func Premultiply(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	)
 	incOpCounter("premultiply")
 	err = vipsCall("premultiply", options)
-	return out, err
-}
-
-// Profile executes the 'profile' operation
-func Profile(in *C.VipsImage, options ...*Option) (*C.VipsImage, *C.VipsImage, error) {
-	var columns *C.VipsImage
-	var rows *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		OutputImage("columns", &columns),
-		OutputImage("rows", &rows),
-	)
-	incOpCounter("profile")
-	err = vipsCall("profile", options)
-	return columns, rows, err
-}
-
-// Project executes the 'project' operation
-func Project(in *C.VipsImage, options ...*Option) (*C.VipsImage, *C.VipsImage, error) {
-	var columns *C.VipsImage
-	var rows *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		OutputImage("columns", &columns),
-		OutputImage("rows", &rows),
-	)
-	incOpCounter("project")
-	err = vipsCall("project", options)
-	return columns, rows, err
-}
-
-// Quadratic executes the 'quadratic' operation
-func Quadratic(in *C.VipsImage, coeff *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("coeff", coeff),
-		OutputImage("out", &out),
-	)
-	incOpCounter("quadratic")
-	err = vipsCall("quadratic", options)
 	return out, err
 }
 
@@ -1785,20 +751,6 @@ func Rank(in *C.VipsImage, width int, height int, index int, options ...*Option)
 	)
 	incOpCounter("rank")
 	err = vipsCall("rank", options)
-	return out, err
-}
-
-// Recomb executes the 'recomb' operation
-func Recomb(in *C.VipsImage, m *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("m", m),
-		OutputImage("out", &out),
-	)
-	incOpCounter("recomb")
-	err = vipsCall("recomb", options)
 	return out, err
 }
 
@@ -1845,35 +797,6 @@ func Reducev(in *C.VipsImage, vshrink float64, options ...*Option) (*C.VipsImage
 	return out, err
 }
 
-// Relational executes the 'relational' operation
-func Relational(left *C.VipsImage, right *C.VipsImage, relational OperationRelational, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("left", left),
-		InputImage("right", right),
-		InputInt("relational", int(relational)),
-		OutputImage("out", &out),
-	)
-	incOpCounter("relational")
-	err = vipsCall("relational", options)
-	return out, err
-}
-
-// Remainder executes the 'remainder' operation
-func Remainder(left *C.VipsImage, right *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("left", left),
-		InputImage("right", right),
-		OutputImage("out", &out),
-	)
-	incOpCounter("remainder")
-	err = vipsCall("remainder", options)
-	return out, err
-}
-
 // Replicate executes the 'replicate' operation
 func Replicate(in *C.VipsImage, across int, down int, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
@@ -1886,20 +809,6 @@ func Replicate(in *C.VipsImage, across int, down int, options ...*Option) (*C.Vi
 	)
 	incOpCounter("replicate")
 	err = vipsCall("replicate", options)
-	return out, err
-}
-
-// Rotate executes the 'rot' operation
-func Rot(in *C.VipsImage, angle Angle, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputInt("angle", int(angle)),
-		OutputImage("out", &out),
-	)
-	incOpCounter("rot")
-	err = vipsCall("rot", options)
 	return out, err
 }
 
@@ -2064,20 +973,6 @@ func Similarity(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	return out, err
 }
 
-// Sines executes the 'sines' operation
-func Sines(width int, height int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		OutputImage("out", &out),
-	)
-	incOpCounter("sines")
-	err = vipsCall("sines", options)
-	return out, err
-}
-
 // Smartcrop executes the 'smartcrop' operation
 func Smartcrop(input *C.VipsImage, width int, height int, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
@@ -2090,20 +985,6 @@ func Smartcrop(input *C.VipsImage, width int, height int, options ...*Option) (*
 	)
 	incOpCounter("smartcrop")
 	err = vipsCall("smartcrop", options)
-	return out, err
-}
-
-// Spcor executes the 'spcor' operation
-func Spcor(in *C.VipsImage, ref *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("in", in),
-		InputImage("ref", ref),
-		OutputImage("out", &out),
-	)
-	incOpCounter("spcor")
-	err = vipsCall("spcor", options)
 	return out, err
 }
 
@@ -2189,58 +1070,6 @@ func Subsample(input *C.VipsImage, xfac int, yfac int, options ...*Option) (*C.V
 	return out, err
 }
 
-// Subtract executes the 'subtract' operation
-func Subtract(left *C.VipsImage, right *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputImage("left", left),
-		InputImage("right", right),
-		OutputImage("out", &out),
-	)
-	incOpCounter("subtract")
-	err = vipsCall("subtract", options)
-	return out, err
-}
-
-// System executes the 'system' operation
-func System(cmdFormat string, options ...*Option) error {
-	var err error
-	options = append(options,
-		InputString("cmd-format", cmdFormat),
-	)
-	incOpCounter("system")
-	err = vipsCall("system", options)
-	return err
-}
-
-// Text executes the 'text' operation
-func Text(text string, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputString("text", text),
-		OutputImage("out", &out),
-	)
-	incOpCounter("text")
-	err = vipsCall("text", options)
-	return out, err
-}
-
-// Thumbnail executes the 'thumbnail' operation
-func Thumbnail(filename string, width int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputString("filename", filename),
-		InputInt("width", width),
-		OutputImage("out", &out),
-	)
-	incOpCounter("thumbnail")
-	err = vipsCall("thumbnail", options)
-	return out, err
-}
-
 // ThumbnailImage executes the 'thumbnail_image' operation
 func ThumbnailImage(in *C.VipsImage, width int, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
@@ -2268,19 +1097,6 @@ func Tilecache(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	return out, err
 }
 
-// Tonelut executes the 'tonelut' operation
-func Tonelut(options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-
-		OutputImage("out", &out),
-	)
-	incOpCounter("tonelut")
-	err = vipsCall("tonelut", options)
-	return out, err
-}
-
 // Unpremultiply executes the 'unpremultiply' operation
 func Unpremultiply(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
@@ -2294,20 +1110,6 @@ func Unpremultiply(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	return out, err
 }
 
-// Worley executes the 'worley' operation
-func Worley(width int, height int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		OutputImage("out", &out),
-	)
-	incOpCounter("worley")
-	err = vipsCall("worley", options)
-	return out, err
-}
-
 // Wrap executes the 'wrap' operation
 func Wrap(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	var out *C.VipsImage
@@ -2318,20 +1120,6 @@ func Wrap(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	)
 	incOpCounter("wrap")
 	err = vipsCall("wrap", options)
-	return out, err
-}
-
-// Xyz executes the 'xyz' operation
-func Xyz(width int, height int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		OutputImage("out", &out),
-	)
-	incOpCounter("xyz")
-	err = vipsCall("xyz", options)
 	return out, err
 }
 
@@ -2384,19 +1172,5 @@ func Yxy2Xyz(in *C.VipsImage, options ...*Option) (*C.VipsImage, error) {
 	)
 	incOpCounter("Yxy2XYZ")
 	err = vipsCall("Yxy2XYZ", options)
-	return out, err
-}
-
-// Zone executes the 'zone' operation
-func Zone(width int, height int, options ...*Option) (*C.VipsImage, error) {
-	var out *C.VipsImage
-	var err error
-	options = append(options,
-		InputInt("width", width),
-		InputInt("height", height),
-		OutputImage("out", &out),
-	)
-	incOpCounter("zone")
-	err = vipsCall("zone", options)
 	return out, err
 }

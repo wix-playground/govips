@@ -4,6 +4,45 @@ import (
 	"math"
 )
 
+// FlipDirection represents the direction to flip
+type FlipDirection int
+
+// Flip enum
+const (
+	FlipNone FlipDirection = iota
+	FlipHorizontal
+	FlipVertical
+	FlipBoth
+)
+
+// Anchor represents the an anchor for cropping and other image operations
+type Anchor int
+
+// Anchor enum
+const (
+	AnchorAuto Anchor = iota
+	AnchorCenter
+	AnchorTop
+	AnchorTopRight
+	AnchorTopLeft
+	AnchorRight
+	AnchorBottom
+	AnchorBottomLeft
+	AnchorBottomRight
+	AnchorLeft
+)
+
+// ResizeStrategy is the strategy to use when resizing an image
+type ResizeStrategy int
+
+// ResizeStrategy enum
+const (
+	ResizeStrategyAuto ResizeStrategy = iota
+	ResizeStrategyEmbed
+	ResizeStrategyCrop
+	ResizeStrategyStretch
+)
+
 // TransformParams are parameters for the transformation
 type TransformParams struct {
 	PadStrategy             ExtendStrategy
@@ -399,7 +438,7 @@ func (b *blackboard) resize() error {
 
 	// Check for the simple scale down cases
 	if b.targetScale != 0 {
-		err := b.image.Resize(b.targetScale, b.targetScale, kernel)
+		err := b.image.Resize(b.targetScale, kernel)
 		if err != nil {
 			return err
 		}
@@ -433,7 +472,7 @@ func (b *blackboard) resize() error {
 	}
 
 	if shrinkX != 1 || shrinkY != 1 {
-		err = b.image.Resize(1.0/shrinkX, 1.0/shrinkY, kernel)
+		err = b.image.ResizeWithVScale(1.0/shrinkX, 1.0/shrinkY, kernel)
 		if err != nil {
 			return err
 		}
