@@ -27,7 +27,7 @@ func vipsResize(in *C.VipsImage, scale float64, kernel Kernel) (*C.VipsImage, er
 
 	scale = math.Min(scale, maxScaleFactor)
 
-	if err := C.resize_image(in, &out, C.double(scale), C.int(-1), C.int(kernel)); err != 0 {
+	if err := C.resize_image(in, &out, C.double(scale), C.double(-1), C.int(kernel)); err != 0 {
 		return nil, handleVipsError(out)
 	}
 

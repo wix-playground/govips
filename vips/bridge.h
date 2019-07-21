@@ -6,20 +6,6 @@
   error_requires_version_8
 #endif
 
-#define INT_TO_GBOOLEAN(bool) (bool > 0 ? TRUE : FALSE)
-
-enum types {
-	UNKNOWN = 0,
-	JPEG,
-	WEBP,
-	PNG,
-	TIFF,
-	GIF,
-	PDF,
-	SVG,
-	MAGICK,
-	HEIF
-};
 typedef struct {
   const char *Text;
 	const char *Font;

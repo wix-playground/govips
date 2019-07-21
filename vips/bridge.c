@@ -1,10 +1,6 @@
 #include "bridge.h"
 
 
-int is_16bit(VipsInterpretation interpretation) {
-	return interpretation == VIPS_INTERPRETATION_RGB16 || interpretation == VIPS_INTERPRETATION_GREY16;
-}
-
 int text(VipsImage **out, const char *text, const char *font, int width, int height, VipsAlign align, int dpi) {
 	return vips_text(out, text, "font", font, "width", width, "height", height, "align", align, "dpi", dpi, NULL);
 }
@@ -83,9 +79,6 @@ int label(VipsImage *in, VipsImage **out, LabelOptions *o) {
 	g_object_unref(base);
 	return 0;
 }
-
-
-
 
 int remove_icc_profile(VipsImage *in) {
   return vips_image_remove(in, VIPS_META_ICC_NAME);

@@ -41,43 +41,6 @@ type LabelParams struct {
 	Alignment Align
 }
 
-// ImageType represents an image type
-type ImageType int
-
-// ImageType enum
-const (
-	ImageTypeUnknown ImageType = C.UNKNOWN
-	ImageTypeGIF     ImageType = C.GIF
-	ImageTypeJPEG    ImageType = C.JPEG
-	ImageTypeMagick  ImageType = C.MAGICK
-	ImageTypePDF     ImageType = C.PDF
-	ImageTypePNG     ImageType = C.PNG
-	ImageTypeSVG     ImageType = C.SVG
-	ImageTypeTIFF    ImageType = C.TIFF
-	ImageTypeWEBP    ImageType = C.WEBP
-	ImageTypeHEIF    ImageType = C.HEIF
-)
-
-var imageTypeExtensionMap = map[ImageType]string{
-	ImageTypeGIF:    ".gif",
-	ImageTypeJPEG:   ".jpeg",
-	ImageTypeMagick: ".magick",
-	ImageTypePDF:    ".pdf",
-	ImageTypePNG:    ".png",
-	ImageTypeSVG:    ".svg",
-	ImageTypeTIFF:   ".tiff",
-	ImageTypeWEBP:   ".webp",
-	ImageTypeHEIF:   ".heic",
-}
-
-// OutputExt returns the canonical extension for the ImageType
-func (i ImageType) OutputExt() string {
-	if ext, ok := imageTypeExtensionMap[i]; ok {
-		return ext
-	}
-	return ""
-}
-
 // Interpolator represents the vips interpolator types
 type Interpolator string
 
@@ -181,19 +144,6 @@ const (
 	OperationComplexImag OperationComplexGet = C.VIPS_OPERATION_COMPLEXGET_IMAG
 )
 
-// ExtendStrategy represents VIPS_EXTEND type
-type ExtendStrategy int
-
-// ExtendStrategy enum
-const (
-	ExtendBlack      ExtendStrategy = C.VIPS_EXTEND_BLACK
-	ExtendCopy       ExtendStrategy = C.VIPS_EXTEND_COPY
-	ExtendRepeat     ExtendStrategy = C.VIPS_EXTEND_REPEAT
-	ExtendMirror     ExtendStrategy = C.VIPS_EXTEND_MIRROR
-	ExtendWhite      ExtendStrategy = C.VIPS_EXTEND_WHITE
-	ExtendBackground ExtendStrategy = C.VIPS_EXTEND_BACKGROUND
-)
-
 // Align represents VIPS_ALIGN
 type Align int
 
@@ -268,18 +218,6 @@ const (
 	MorphologyErode  OperationMorphology = C.VIPS_OPERATION_MORPHOLOGY_ERODE
 	MorphologyDilate OperationMorphology = C.VIPS_OPERATION_MORPHOLOGY_DILATE
 )
-
-var ImageTypes = map[ImageType]string{
-	ImageTypeGIF:    "gif",
-	ImageTypeJPEG:   "jpeg",
-	ImageTypeMagick: "magick",
-	ImageTypePDF:    "pdf",
-	ImageTypePNG:    "png",
-	ImageTypeSVG:    "svg",
-	ImageTypeTIFF:   "tiff",
-	ImageTypeWEBP:   "webp",
-	ImageTypeHEIF:   "heif",
-}
 
 type Composite struct {
 	Image     *ImageRef

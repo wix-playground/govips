@@ -5,6 +5,19 @@
 #include <vips/foreign.h>
 
 
+enum types {
+	UNKNOWN = 0,
+	JPEG,
+	WEBP,
+	PNG,
+	TIFF,
+	GIF,
+	PDF,
+	SVG,
+	MAGICK,
+	HEIF
+};
+
 int load_image_buffer(void *buf, size_t len, int imageType, VipsImage **out);
 
 int find_image_type_loader(int t);

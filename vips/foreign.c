@@ -1,3 +1,4 @@
+#include "lang.h"
 #include "foreign.h"
 
 int load_image_buffer(void *buf, size_t len, int imageType, VipsImage **out) {

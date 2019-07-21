@@ -3,6 +3,7 @@ package vips
 // #cgo pkg-config: vips
 // #include "bridge.h"
 // #include "foreign.h"
+// #include "color.h"
 import "C"
 import (
 	"fmt"

@@ -9,6 +9,55 @@ import (
 	"unsafe"
 )
 
+// ImageType represents an image type
+type ImageType int
+
+// ImageType enum
+const (
+	ImageTypeUnknown ImageType = C.UNKNOWN
+	ImageTypeGIF     ImageType = C.GIF
+	ImageTypeJPEG    ImageType = C.JPEG
+	ImageTypeMagick  ImageType = C.MAGICK
+	ImageTypePDF     ImageType = C.PDF
+	ImageTypePNG     ImageType = C.PNG
+	ImageTypeSVG     ImageType = C.SVG
+	ImageTypeTIFF    ImageType = C.TIFF
+	ImageTypeWEBP    ImageType = C.WEBP
+	ImageTypeHEIF    ImageType = C.HEIF
+)
+
+var imageTypeExtensionMap = map[ImageType]string{
+	ImageTypeGIF:    ".gif",
+	ImageTypeJPEG:   ".jpeg",
+	ImageTypeMagick: ".magick",
+	ImageTypePDF:    ".pdf",
+	ImageTypePNG:    ".png",
+	ImageTypeSVG:    ".svg",
+	ImageTypeTIFF:   ".tiff",
+	ImageTypeWEBP:   ".webp",
+	ImageTypeHEIF:   ".heic",
+}
+
+var ImageTypes = map[ImageType]string{
+	ImageTypeGIF:    "gif",
+	ImageTypeJPEG:   "jpeg",
+	ImageTypeMagick: "magick",
+	ImageTypePDF:    "pdf",
+	ImageTypePNG:    "png",
+	ImageTypeSVG:    "svg",
+	ImageTypeTIFF:   "tiff",
+	ImageTypeWEBP:   "webp",
+	ImageTypeHEIF:   "heif",
+}
+
+// FileExt returns the canonical extension for the ImageType
+func (i ImageType) FileExt() string {
+	if ext, ok := imageTypeExtensionMap[i]; ok {
+		return ext
+	}
+	return ""
+}
+
 func vipsLoadFromBuffer(buf []byte) (*C.VipsImage, ImageType, error) {
 	// Reference buf here so it's not garbage collected during image initialization.
 	defer runtime.KeepAlive(buf)
@@ -28,7 +77,7 @@ func vipsLoadFromBuffer(buf []byte) (*C.VipsImage, ImageType, error) {
 	bufLength := C.size_t(len(buf))
 	imageBuf := unsafe.Pointer(&buf[0])
 
-	err := C.init_image(imageBuf, bufLength, C.int(imageType), &out)
+	err := C.load_image_buffer(imageBuf, bufLength, C.int(imageType), &out)
 	if err != 0 {
 		return nil, ImageTypeUnknown, handleVipsError(out)
 	}

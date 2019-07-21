@@ -151,6 +151,17 @@ func ShutdownThread() {
 	C.vips_thread_shutdown()
 }
 
+// DetermineImageType attempts to determine the image type of the given buffer
+func DetermineImageType(buf []byte) ImageType {
+	return vipsDetermineImageType(buf)
+}
+
+func IsTypeSupported(imageType ImageType) bool {
+	startupIfNeeded()
+
+	return supportedImageTypes[imageType]
+}
+
 //noinspection GoUnusedExportedFunction
 func ClearCache() {
 	C.vips_cache_drop_all()

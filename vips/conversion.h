@@ -7,7 +7,7 @@ int copy_image(VipsImage *in, VipsImage **out);
 
 int embed_image(VipsImage *in, VipsImage **out, int left, int top, int width, int height, int extend, double r, double g, double b);
 
-int flip_image(VipsImage *in, VipsImage **out, VipsDirection direction);
+int flip_image(VipsImage *in, VipsImage **out, int direction);
 
 int extract_image_area(VipsImage *in, VipsImage **out, int left, int top, int width, int height);
 
@@ -24,3 +24,4 @@ int add_alpha(VipsImage *in, VipsImage **out);
 
 int composite2_image(VipsImage *base, VipsImage *overlay, VipsImage **out, int mode, gint x, gint y);
 
+int is_16bit(VipsInterpretation interpretation);

@@ -205,7 +205,7 @@ func (r *ImageRef) Export(params *ExportParams) ([]byte, *ImageMetadata, error) 
 }
 
 func (r *ImageRef) Composite(overlay *ImageRef, mode BlendMode, x, y int) error {
-	out, err := vipsComposite2(r.image, overlay, mode, x, y)
+	out, err := vipsComposite2(r.image, overlay.image, mode, x, y)
 	if err != nil {
 		return err
 	}

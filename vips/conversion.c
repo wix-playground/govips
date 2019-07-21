@@ -17,7 +17,7 @@ int embed_image(VipsImage *in, VipsImage **out, int left, int top, int width, in
 	return vips_embed(in, out, left, top, width, height, "extend", extend, NULL);
 }
 
-int flip_image(VipsImage *in, VipsImage **out, VipsDirection direction) {
+int flip_image(VipsImage *in, VipsImage **out, int direction) {
 	return vips_flip(in, out, direction, NULL);
 }
 
@@ -64,10 +64,14 @@ int flatten_image(VipsImage *in, VipsImage **out, double r, double g, double b) 
 	return code;
 }
 
+int is_16bit(VipsInterpretation interpretation) {
+	return interpretation == VIPS_INTERPRETATION_RGB16 || interpretation == VIPS_INTERPRETATION_GREY16;
+}
+
 int add_alpha(VipsImage *in, VipsImage **out) {
 	return vips_addalpha(in, out, NULL);
 }
 
-int composite2_image(VipsImage *base, VipsImage *overlay, VipsImage **out, VipsBlendMode mode, gint x, gint y) {
+int composite2_image(VipsImage *base, VipsImage *overlay, VipsImage **out, int mode, gint x, gint y) {
 	return vips_composite2(base, overlay, out, mode, "x", x, "y", y, NULL);
 }

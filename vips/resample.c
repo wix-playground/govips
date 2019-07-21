@@ -12,7 +12,7 @@ int affine_image(VipsImage *in, VipsImage **out, double a, double b, double c, d
 	return vips_affine(in, out, a, b, c, d, "interpolate", interpolator, NULL);
 }
 
-int resize_image(VipsImage *in, VipsImage **out, double scale, gdouble vscale, VipsKernel kernel) {
+int resize_image(VipsImage *in, VipsImage **out, double scale, gdouble vscale, int kernel) {
 	if (vscale > 0) {
 		return vips_resize(in, out, scale, "vscale", vscale, "kernel", kernel, NULL);
 	}

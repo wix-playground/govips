@@ -69,6 +69,19 @@ const (
 	Angle45_315 Angle45 = C.VIPS_ANGLE45_D315
 )
 
+// ExtendStrategy represents VIPS_EXTEND type
+type ExtendStrategy int
+
+// ExtendStrategy enum
+const (
+	ExtendBlack      ExtendStrategy = C.VIPS_EXTEND_BLACK
+	ExtendCopy       ExtendStrategy = C.VIPS_EXTEND_COPY
+	ExtendRepeat     ExtendStrategy = C.VIPS_EXTEND_REPEAT
+	ExtendMirror     ExtendStrategy = C.VIPS_EXTEND_MIRROR
+	ExtendWhite      ExtendStrategy = C.VIPS_EXTEND_WHITE
+	ExtendBackground ExtendStrategy = C.VIPS_EXTEND_BACKGROUND
+)
+
 // https://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-copy
 func vipsCopyImage(in *C.VipsImage) (*C.VipsImage, error) {
 	var out *C.VipsImage
