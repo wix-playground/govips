@@ -24,55 +24,6 @@ type vipsLabelOptions struct {
 	Color     [3]C.double
 }
 
-func vipsCall(name string, options []*Option) error {
-	operation := vipsOperationNew(name)
-
-	return vipsCallOperation(operation, options)
-}
-
-func vipsOperationNew(name string) *C.VipsOperation {
-	cName := C.CString(name)
-	defer freeCString(cName)
-
-	return C.vips_operation_new(cName)
-}
-
-func vipsCallOperation(operation *C.VipsOperation, options []*Option) error {
-	// todo: replace with https://jcupitt.github.io/libvips/API/current/VipsOperation.html#vips-cache-operation-build
-
-	for _, option := range options {
-		if option.Output() {
-			continue
-		}
-		defer option.Close()
-
-		cName := C.CString(option.Name)
-		defer freeCString(cName)
-
-		C.gobject_set_property((*C.VipsObject)(unsafe.Pointer(operation)), cName, option.GValue())
-	}
-
-	if ret := C.vips_cache_operation_buildp(&operation); ret != 0 {
-		return handleImageError(nil)
-	}
-
-	defer unrefPointer(unsafe.Pointer(operation))
-
-	for _, option := range options {
-		if !option.Output() {
-			continue
-		}
-		defer option.Close()
-
-		cName := C.CString(option.Name)
-		defer freeCString(cName)
-
-		C.g_object_get_property((*C.GObject)(unsafe.Pointer(operation)), (*C.gchar)(cName), option.GValue())
-	}
-
-	return nil
-}
-
 func vipsExportBuffer(image *C.VipsImage, params *ExportParams) ([]byte, ImageType, error) {
 	var buf []byte
 	var err error
