@@ -1,13 +1,14 @@
 package vips
 
 // #cgo pkg-config: vips
-// #include "bridge.h"
+// #include <vips/vips.h>
 import "C"
 
 import (
 	"errors"
 	"fmt"
 	dbg "runtime/debug"
+	"unsafe"
 )
 
 var (
@@ -15,11 +16,23 @@ var (
 	ErrUnsupportedImageFormat = errors.New("unsupported image format")
 )
 
-func handleVipsError(out *C.VipsImage) error {
+func handleImageError(out *C.VipsImage) error {
 	if out != nil {
 		unrefImage(out)
 	}
 
+	return handleVipsError()
+}
+
+func handleSaveBufferError(out unsafe.Pointer) error {
+	if out != nil {
+		gFreePointer(out)
+	}
+
+	return handleVipsError()
+}
+
+func handleVipsError() error {
 	s := C.GoString(C.vips_error_buffer())
 	C.vips_error_clear()
 

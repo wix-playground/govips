@@ -53,7 +53,7 @@ func vipsCallOperation(operation *C.VipsOperation, options []*Option) error {
 	}
 
 	if ret := C.vips_cache_operation_buildp(&operation); ret != 0 {
-		return handleVipsError(nil)
+		return handleImageError(nil)
 	}
 
 	defer unrefPointer(unsafe.Pointer(operation))
@@ -74,6 +74,9 @@ func vipsCallOperation(operation *C.VipsOperation, options []*Option) error {
 }
 
 func vipsExportBuffer(image *C.VipsImage, params *ExportParams) ([]byte, ImageType, error) {
+	var buf []byte
+	var err error
+
 	tmpImage, err := vipsPrepareForExport(image, params)
 	if err != nil {
 		return nil, ImageTypeUnknown, err
@@ -85,12 +88,6 @@ func vipsExportBuffer(image *C.VipsImage, params *ExportParams) ([]byte, ImageTy
 		defer unrefImage(tmpImage)
 	}
 
-	cLen := C.size_t(0)
-	var cErr C.int
-	interlaced := C.int(boolToInt(params.Interlaced))
-	quality := C.int(params.Quality)
-	lossless := C.int(boolToInt(params.Lossless))
-	stripMetadata := C.int(boolToInt(params.StripMetadata))
 	format := params.Format
 
 	if format != ImageTypeUnknown && !IsTypeSupported(format) {
@@ -104,33 +101,23 @@ func vipsExportBuffer(image *C.VipsImage, params *ExportParams) ([]byte, ImageTy
 		}
 	}
 
-	var ptr unsafe.Pointer
-
 	switch format {
 	case ImageTypeWEBP:
-		incOpCounter("save_webp_buffer")
-		cErr = C.save_webp_buffer(tmpImage, &ptr, &cLen, stripMetadata, quality, lossless)
+		buf, err = saveWebPToBuffer(tmpImage, params.StripMetadata, params.Quality, params.Lossless)
 	case ImageTypePNG:
-		incOpCounter("save_png_buffer")
-		cErr = C.save_png_buffer(tmpImage, &ptr, &cLen, stripMetadata, C.int(params.Compression), quality, interlaced)
+		buf, err = savePNGToBuffer(tmpImage, params.StripMetadata, params.Compression, params.Quality, params.Interlaced)
 	case ImageTypeTIFF:
-		incOpCounter("save_tiff_buffer")
-		cErr = C.save_tiff_buffer(tmpImage, &ptr, &cLen)
+		buf, err = saveTIFFToBuffer(tmpImage)
 	case ImageTypeHEIF:
-		incOpCounter("save_heif_buffer")
-		cErr = C.save_heif_buffer(tmpImage, &ptr, &cLen, quality, lossless)
+		buf, err = saveHEIFToBuffer(tmpImage, params.Quality, params.Lossless)
 	default:
-		incOpCounter("save_jpeg_buffer")
 		format = ImageTypeJPEG
-		cErr = C.save_jpeg_buffer(tmpImage, &ptr, &cLen, stripMetadata, quality, interlaced)
+		buf, err = saveJPEGToBuffer(tmpImage, params.Quality, params.StripMetadata, params.Interlaced)
 	}
 
-	if int(cErr) != 0 {
-		return nil, ImageTypeUnknown, handleVipsError(nil)
+	if err != nil {
+		return nil, ImageTypeUnknown, err
 	}
-
-	buf := C.GoBytes(ptr, C.int(cLen))
-	gFreePointer(ptr)
 
 	return buf, format, nil
 }
@@ -161,7 +148,7 @@ func vipsPrepareForExport(in *C.VipsImage, params *ExportParams) (*C.VipsImage, 
 
 		err := C.to_colorspace(in, &out, interpretation)
 		if int(err) != 0 {
-			return nil, handleVipsError(out)
+			return nil, handleImageError(out)
 		}
 
 		return out, nil
@@ -235,7 +222,7 @@ func vipsLabel(in *C.VipsImage, params *LabelParams) (*C.VipsImage, error) {
 
 	err := C.label(in, &out, (*C.LabelOptions)(unsafe.Pointer(&opts)))
 	if err != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil

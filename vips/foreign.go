@@ -79,8 +79,99 @@ func vipsLoadFromBuffer(buf []byte) (*C.VipsImage, ImageType, error) {
 
 	err := C.load_image_buffer(imageBuf, bufLength, C.int(imageType), &out)
 	if err != 0 {
-		return nil, ImageTypeUnknown, handleVipsError(out)
+		return nil, ImageTypeUnknown, handleImageError(out)
 	}
 
 	return out, imageType, nil
+}
+
+func savePNGToBuffer(in *C.VipsImage, stripMetadata bool, compression, quality int, interlaced bool) ([]byte, error) {
+	incOpCounter("save_png_buffer")
+	var ptr unsafe.Pointer
+	cLen := C.size_t(0)
+
+	strip := C.int(boolToInt(stripMetadata))
+	comp := C.int(compression)
+	qual := C.int(quality)
+	inter := C.int(boolToInt(interlaced))
+
+	if err := C.save_png_buffer(in, &ptr, &cLen, strip, comp, qual, inter); err != 0 {
+		return nil, handleSaveBufferError(ptr)
+	}
+
+	buf := C.GoBytes(ptr, C.int(cLen))
+	gFreePointer(ptr)
+
+	return buf, nil
+}
+
+func saveWebPToBuffer(in *C.VipsImage, stripMetadata bool, quality int, lossless bool) ([]byte, error) {
+	incOpCounter("save_webp_buffer")
+	var ptr unsafe.Pointer
+	cLen := C.size_t(0)
+
+	strip := C.int(boolToInt(stripMetadata))
+	qual := C.int(quality)
+	loss := C.int(boolToInt(lossless))
+
+	if err := C.save_webp_buffer(in, &ptr, &cLen, strip, qual, loss); err != 0 {
+		return nil, handleSaveBufferError(ptr)
+	}
+
+	buf := C.GoBytes(ptr, C.int(cLen))
+	gFreePointer(ptr)
+
+	return buf, nil
+}
+
+func saveTIFFToBuffer(in *C.VipsImage) ([]byte, error) {
+	incOpCounter("save_tiff_buffer")
+	var ptr unsafe.Pointer
+	cLen := C.size_t(0)
+
+	if err := C.save_tiff_buffer(in, &ptr, &cLen); err != 0 {
+		return nil, handleSaveBufferError(ptr)
+	}
+
+	buf := C.GoBytes(ptr, C.int(cLen))
+	gFreePointer(ptr)
+
+	return buf, nil
+}
+
+func saveHEIFToBuffer(in *C.VipsImage, quality int, lossless bool) ([]byte, error) {
+	incOpCounter("save_heif_buffer")
+	var ptr unsafe.Pointer
+	cLen := C.size_t(0)
+
+	qual := C.int(quality)
+	loss := C.int(boolToInt(lossless))
+
+	if err := C.save_heif_buffer(in, &ptr, &cLen, qual, loss); err != 0 {
+		return nil, handleSaveBufferError(ptr)
+	}
+
+	buf := C.GoBytes(ptr, C.int(cLen))
+	gFreePointer(ptr)
+
+	return buf, nil
+}
+
+func saveJPEGToBuffer(in *C.VipsImage, quality int, stripMetadata, interlaced bool) ([]byte, error) {
+	incOpCounter("save_jpeg_buffer")
+	var ptr unsafe.Pointer
+	cLen := C.size_t(0)
+
+	strip := C.int(boolToInt(stripMetadata))
+	qual := C.int(quality)
+	inter := C.int(boolToInt(interlaced))
+
+	if err := C.save_jpeg_buffer(in, &ptr, &cLen, strip, qual, inter); err != 0 {
+		return nil, handleSaveBufferError(ptr)
+	}
+
+	buf := C.GoBytes(ptr, C.int(cLen))
+	gFreePointer(ptr)
+
+	return buf, nil
 }

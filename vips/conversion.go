@@ -88,7 +88,7 @@ func vipsCopyImage(in *C.VipsImage) (*C.VipsImage, error) {
 
 	err := C.copy_image(in, &out)
 	if int(err) != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil
@@ -100,7 +100,7 @@ func vipsEmbed(in *C.VipsImage, left, top, width, height int, extend ExtendStrat
 	var out *C.VipsImage
 
 	if err := C.embed_image(in, &out, C.int(left), C.int(top), C.int(width), C.int(height), C.int(extend), 0, 0, 0); err != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil
@@ -112,7 +112,7 @@ func vipsFlip(in *C.VipsImage, direction Direction) (*C.VipsImage, error) {
 	var out *C.VipsImage
 
 	if err := C.flip_image(in, &out, C.int(direction)); err != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil
@@ -124,7 +124,7 @@ func vipsExtractArea(in *C.VipsImage, left, top, width, height int) (*C.VipsImag
 	var out *C.VipsImage
 
 	if err := C.extract_image_area(in, &out, C.int(left), C.int(top), C.int(width), C.int(height)); err != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil
@@ -136,7 +136,7 @@ func vipsExtractBand(in *C.VipsImage, band, num int) (*C.VipsImage, error) {
 	var out *C.VipsImage
 
 	if err := C.extract_band(in, &out, C.int(band), C.int(num)); err != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil
@@ -148,7 +148,7 @@ func vipsRotate(in *C.VipsImage, angle Angle) (*C.VipsImage, error) {
 	var out *C.VipsImage
 
 	if err := C.rot_image(in, &out, C.VipsAngle(angle)); err != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil
@@ -160,7 +160,7 @@ func vipsAutoRotate(in *C.VipsImage) (*C.VipsImage, error) {
 	var out *C.VipsImage
 
 	if err := C.autorot_image(in, &out); err != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil
@@ -172,7 +172,7 @@ func vipsZoom(in *C.VipsImage, xFactor, yFactor int) (*C.VipsImage, error) {
 	var out *C.VipsImage
 
 	if err := C.zoom_image(in, &out, C.int(xFactor), C.int(yFactor)); err != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil
@@ -184,7 +184,7 @@ func vipsBandJoin(ins []*C.VipsImage) (*C.VipsImage, error) {
 	var out *C.VipsImage
 
 	if err := C.bandjoin(&ins[0], &out, C.int(len(ins))); err != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil
@@ -197,7 +197,7 @@ func vipsFlatten(in *C.VipsImage, color *Color) (*C.VipsImage, error) {
 
 	err := C.flatten_image(in, &out, C.double(color.R), C.double(color.G), C.double(color.B))
 	if int(err) != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil
@@ -208,7 +208,7 @@ func vipsAddAlpha(in *C.VipsImage) (*C.VipsImage, error) {
 	var out *C.VipsImage
 
 	if err := C.add_alpha(in, &out); err != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil
@@ -220,7 +220,7 @@ func vipsComposite2(base *C.VipsImage, overlay *C.VipsImage, mode BlendMode, x, 
 	var out *C.VipsImage
 
 	if err := C.composite2_image(base, overlay, &out, C.int(mode), C.gint(x), C.gint(y)); err != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil

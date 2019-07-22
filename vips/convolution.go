@@ -10,7 +10,7 @@ func vipsGaussianBlur(in *C.VipsImage, sigma float64) (*C.VipsImage, error) {
 	var out *C.VipsImage
 
 	if err := C.gaussian_blur_image(in, &out, C.double(sigma)); err != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil
@@ -22,7 +22,7 @@ func vipsSharpen(in *C.VipsImage, sigma float64, x1 float64, m2 float64) (*C.Vip
 	var out *C.VipsImage
 
 	if err := C.sharpen_image(in, &out, C.double(sigma), C.double(x1), C.double(m2)); err != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil

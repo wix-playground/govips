@@ -10,7 +10,7 @@ func vipsAdd(left *C.VipsImage, right *C.VipsImage) (*C.VipsImage, error) {
 	var out *C.VipsImage
 
 	if err := C.add(left, right, &out); err != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil
@@ -22,7 +22,7 @@ func vipsMultiply(left *C.VipsImage, right *C.VipsImage) (*C.VipsImage, error) {
 	var out *C.VipsImage
 
 	if err := C.multiply(left, right, &out); err != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil
@@ -34,7 +34,7 @@ func vipsLinear1(in *C.VipsImage, a, b float64) (*C.VipsImage, error) {
 	var out *C.VipsImage
 
 	if err := C.linear1(in, &out, C.double(a), C.double(b)); err != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil
@@ -46,7 +46,7 @@ func vipsInvert(in *C.VipsImage) (*C.VipsImage, error) {
 	var out *C.VipsImage
 
 	if err := C.invert_image(in, &out); err != 0 {
-		return nil, handleVipsError(out)
+		return nil, handleImageError(out)
 	}
 
 	return out, nil
