@@ -92,7 +92,7 @@ func (r *ImageRef) Metadata() *ImageMetadata {
 }
 
 // create a new ref
-func (r *ImageRef) Copy(options ...*Option) (*ImageRef, error) {
+func (r *ImageRef) Copy() (*ImageRef, error) {
 	out, err := vipsCopyImage(r.image)
 	if err != nil {
 		return nil, err
@@ -408,7 +408,7 @@ func (r *ImageRef) Flip(direction Direction) error {
 }
 
 // Rotate executes the 'rot' operation
-func (r *ImageRef) Rotate(angle Angle, options ...*Option) error {
+func (r *ImageRef) Rotate(angle Angle) error {
 	out, err := vipsRotate(r.image, angle)
 	if err != nil {
 		return err
