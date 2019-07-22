@@ -327,6 +327,11 @@ func (t *Transform) Interpretation(interpretation Interpretation) *Transform {
 	return t
 }
 
+// Alias to Interpretation()
+func (t *Transform) ColorSpace(interpretation Interpretation) *Transform {
+	return t.Interpretation(interpretation)
+}
+
 // Interlaced uses interlaced for image that support it
 func (t *Transform) Interlaced() *Transform {
 	t.exportParams.Interlaced = true

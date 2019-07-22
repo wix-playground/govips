@@ -114,6 +114,7 @@ int save_heif_buffer(VipsImage *in, void **buf, size_t *len, int quality, int lo
 	);
 }
 
+// https://libvips.github.io/libvips/API/current/VipsForeignSave.html#vips-tiffsave-buffer
 int save_tiff_buffer(VipsImage *in, void **buf, size_t *len) {
 	return vips_tiffsave_buffer(in, buf, len, NULL);
 }
