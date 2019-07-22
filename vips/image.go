@@ -6,6 +6,7 @@ import "C"
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"runtime"
@@ -33,6 +34,19 @@ type ImageMetadata struct {
 	Format ImageType
 	Width  int
 	Height int
+}
+
+// ExportParams are options when exporting an image to file or buffer
+type ExportParams struct {
+	Format          ImageType
+	Quality         int
+	Compression     int
+	Interlaced      bool
+	Lossless        bool
+	StripProfile    bool
+	StripMetadata   bool
+	Interpretation  Interpretation
+	BackgroundColor *Color
 }
 
 // NewImageFromReader loads an ImageRef from the given reader
@@ -133,6 +147,11 @@ func (r *ImageRef) HasProfile() bool {
 	return vipsHasICCProfile(r.image)
 }
 
+// alias to HasProfile()
+func (r *ImageRef) HasICCProfile() bool {
+	return r.HasProfile()
+}
+
 // HasAlpha returns if the image has an alpha layer.
 func (r *ImageRef) HasAlpha() bool {
 	return vipsHasAlpha(r.image)
@@ -173,6 +192,15 @@ func (r *ImageRef) Interpretation() Interpretation {
 	return Interpretation(int(r.image.Type))
 }
 
+// Alias to Interpretation()
+func (r *ImageRef) ColorSpace() Interpretation {
+	return r.Interpretation()
+}
+
+func (r *ImageRef) IsColorSpaceSupported() bool {
+	return vipsIsColorSpaceSupported(r.image)
+}
+
 // Export exports the image
 func (r *ImageRef) Export(params *ExportParams) ([]byte, *ImageMetadata, error) {
 	p := params
@@ -185,7 +213,7 @@ func (r *ImageRef) Export(params *ExportParams) ([]byte, *ImageMetadata, error) 
 	}
 
 	// the exported buf is not necessarily in same format as the original buf, might default to JPEG as well.
-	buf, format, err := vipsExportBuffer(r.image, p)
+	buf, format, err := r.exportBuffer(p)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -267,6 +295,21 @@ func (r *ImageRef) AutoRotate() error {
 // ExtractArea executes the 'extract_area' operation
 func (r *ImageRef) ExtractArea(left int, top int, width int, height int) error {
 	out, err := vipsExtractArea(r.image, left, top, width, height)
+	if err != nil {
+		return err
+	}
+	r.setImage(out)
+	return nil
+}
+
+func (r *ImageRef) RemoveICCProfile() error {
+	vipsRemoveICCProfile(r.image)
+	// this works in place on the header
+	return nil
+}
+
+func (r *ImageRef) ToColorSpace(interpretation Interpretation) error {
+	out, err := vipsToColorSpace(r.image, interpretation)
 	if err != nil {
 		return err
 	}
@@ -405,6 +448,70 @@ func (r *ImageRef) setImage(image *C.VipsImage) {
 	}
 
 	r.image = image
+}
+
+func (r *ImageRef) exportBuffer(params *ExportParams) ([]byte, ImageType, error) {
+	var buf []byte
+	var err error
+
+	format := params.Format
+	if format != ImageTypeUnknown && !IsTypeSupported(format) {
+		return nil, ImageTypeUnknown, fmt.Errorf("cannot save to %#v", ImageTypes[format])
+	}
+
+	if params.Quality == 0 {
+		params.Quality = defaultQuality
+	}
+
+	if params.Compression == 0 {
+		params.Compression = defaultCompression
+	}
+
+	if params.Interpretation == 0 {
+		params.Interpretation = r.Interpretation()
+	}
+
+	if params.StripProfile {
+		err = r.RemoveICCProfile()
+		if err != nil {
+			return nil, ImageTypeUnknown, err
+		}
+	}
+
+	// Apply the proper colour space
+	if r.IsColorSpaceSupported() && params.Interpretation != r.Interpretation() {
+		err = r.ToColorSpace(params.Interpretation)
+		if err != nil {
+			return nil, ImageTypeUnknown, err
+		}
+	}
+
+	if params.BackgroundColor != nil && r.HasAlpha() {
+		err = r.Flatten(params.BackgroundColor)
+		if err != nil {
+			return nil, ImageTypeUnknown, err
+		}
+	}
+
+	switch format {
+	case ImageTypeWEBP:
+		buf, err = vipsSaveWebPToBuffer(r.image, params.StripMetadata, params.Quality, params.Lossless)
+	case ImageTypePNG:
+		buf, err = vipsSavePNGToBuffer(r.image, params.StripMetadata, params.Compression, params.Quality, params.Interlaced)
+	case ImageTypeTIFF:
+		buf, err = vipsSaveTIFFToBuffer(r.image)
+	case ImageTypeHEIF:
+		buf, err = vipsSaveHEIFToBuffer(r.image, params.Quality, params.Lossless)
+	default:
+		format = ImageTypeJPEG
+		buf, err = vipsSaveJPEGToBuffer(r.image, params.Quality, params.StripMetadata, params.Interlaced)
+	}
+
+	if err != nil {
+		return nil, ImageTypeUnknown, err
+	}
+
+	return buf, format, nil
 }
 
 ///////////////

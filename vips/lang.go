@@ -1,7 +1,7 @@
 package vips
 
 // #cgo pkg-config: vips
-// #include "bridge.h"
+// #include <vips/vips.h>
 import "C"
 
 import (
