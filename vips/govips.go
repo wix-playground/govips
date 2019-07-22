@@ -2,6 +2,7 @@ package vips
 
 // #cgo pkg-config: vips
 // #include <vips/vips.h>
+// #include "govips.h"
 import "C"
 import (
 	"fmt"
@@ -149,17 +150,6 @@ func Shutdown() {
 // ShutdownThread clears the cache for for the given thread
 func ShutdownThread() {
 	C.vips_thread_shutdown()
-}
-
-// DetermineImageType attempts to determine the image type of the given buffer
-func DetermineImageType(buf []byte) ImageType {
-	return vipsDetermineImageType(buf)
-}
-
-func IsTypeSupported(imageType ImageType) bool {
-	startupIfNeeded()
-
-	return supportedImageTypes[imageType]
 }
 
 //noinspection GoUnusedExportedFunction

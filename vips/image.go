@@ -376,7 +376,7 @@ func (r *ImageRef) Rotate(angle Angle, options ...*Option) error {
 
 // Label executes the 'label' operation
 func (r *ImageRef) Label(labelParams *LabelParams) error {
-	out, err := vipsLabel(r.image, labelParams)
+	out, err := labelImage(r.image, labelParams)
 	if err != nil {
 		return err
 	}

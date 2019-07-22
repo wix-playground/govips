@@ -2,26 +2,22 @@ package vips
 
 // #cgo pkg-config: vips
 // #include "bridge.h"
-// #include "foreign.h"
-// #include "color.h"
 import "C"
 import (
 	"fmt"
-	"unsafe"
 )
 
-type vipsLabelOptions struct {
-	Text      *C.char
-	Font      *C.char
-	Width     C.int
-	Height    C.int
-	OffsetX   C.int
-	OffsetY   C.int
-	Alignment C.VipsAlign
-	DPI       C.int
-	Margin    C.int
-	Opacity   C.float
-	Color     [3]C.double
+// ExportParams are options when exporting an image to file or buffer
+type ExportParams struct {
+	Format          ImageType
+	Quality         int
+	Compression     int
+	Interlaced      bool
+	Lossless        bool
+	StripProfile    bool
+	StripMetadata   bool
+	Interpretation  Interpretation
+	BackgroundColor *Color
 }
 
 func vipsExportBuffer(image *C.VipsImage, params *ExportParams) ([]byte, ImageType, error) {
@@ -99,75 +95,4 @@ func vipsPrepareForExport(in *C.VipsImage, params *ExportParams) (*C.VipsImage, 
 	}
 
 	return in, nil
-}
-
-func vipsDetermineImageType(buf []byte) ImageType {
-	if len(buf) < 12 {
-		return ImageTypeUnknown
-	}
-	if buf[0] == 0xFF && buf[1] == 0xD8 && buf[2] == 0xFF {
-		return ImageTypeJPEG
-	}
-	if IsTypeSupported(ImageTypeGIF) && buf[0] == 0x47 && buf[1] == 0x49 && buf[2] == 0x46 {
-		return ImageTypeGIF
-	}
-	if buf[0] == 0x89 && buf[1] == 0x50 && buf[2] == 0x4E && buf[3] == 0x47 {
-		return ImageTypePNG
-	}
-	if IsTypeSupported(ImageTypeTIFF) &&
-		((buf[0] == 0x49 && buf[1] == 0x49 && buf[2] == 0x2A && buf[3] == 0x0) ||
-			(buf[0] == 0x4D && buf[1] == 0x4D && buf[2] == 0x0 && buf[3] == 0x2A)) {
-		return ImageTypeTIFF
-	}
-	if IsTypeSupported(ImageTypePDF) && buf[0] == 0x25 && buf[1] == 0x50 && buf[2] == 0x44 && buf[3] == 0x46 {
-		return ImageTypePDF
-	}
-	if IsTypeSupported(ImageTypeWEBP) && buf[8] == 0x57 && buf[9] == 0x45 && buf[10] == 0x42 && buf[11] == 0x50 {
-		return ImageTypeWEBP
-	}
-	if IsTypeSupported(ImageTypeSVG) && buf[0] == 0x3C && buf[1] == 0x3F && buf[2] == 0x78 && buf[3] == 0x6D {
-		return ImageTypeSVG
-	}
-	// https://github.com/strukturag/libheif/blob/master/libheif/heif.cc
-	if IsTypeSupported(ImageTypeHEIF) && (buf[4] == 'f' && buf[5] == 't' && buf[6] == 'y' && buf[7] == 'p') &&
-		(buf[8] == 'h' && buf[9] == 'e' && buf[10] == 'i' && buf[11] == 'c') {
-		return ImageTypeHEIF
-	}
-	return ImageTypeUnknown
-}
-
-func vipsLabel(in *C.VipsImage, params *LabelParams) (*C.VipsImage, error) {
-	incOpCounter("label")
-	var out *C.VipsImage
-
-	text := C.CString(params.Text)
-	defer freeCString(text)
-
-	font := C.CString(params.Font)
-	defer freeCString(font)
-
-	color := [3]C.double{C.double(params.Color.R), C.double(params.Color.G), C.double(params.Color.B)}
-	w := params.Width.GetRounded(int(in.Xsize))
-	h := params.Height.GetRounded(int(in.Ysize))
-	offsetX := params.OffsetX.GetRounded(int(in.Xsize))
-	offsetY := params.OffsetY.GetRounded(int(in.Ysize))
-
-	opts := vipsLabelOptions{
-		Text:      text,
-		Font:      font,
-		Width:     C.int(w),
-		Height:    C.int(h),
-		OffsetX:   C.int(offsetX),
-		OffsetY:   C.int(offsetY),
-		Alignment: C.VipsAlign(params.Alignment),
-		Opacity:   C.float(params.Opacity),
-		Color:     color,
-	}
-
-	err := C.label(in, &out, (*C.LabelOptions)(unsafe.Pointer(&opts)))
-	if err != 0 {
-		return nil, handleImageError(out)
-	}
-
-	return out, nil
 }

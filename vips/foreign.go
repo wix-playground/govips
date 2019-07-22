@@ -4,7 +4,9 @@ package vips
 // #include "foreign.h"
 import "C"
 import (
+	"bytes"
 	"log"
+	"math"
 	"runtime"
 	"unsafe"
 )
@@ -58,13 +60,104 @@ func (i ImageType) FileExt() string {
 	return ""
 }
 
+func IsTypeSupported(imageType ImageType) bool {
+	startupIfNeeded()
+
+	return supportedImageTypes[imageType]
+}
+
+// DetermineImageType attempts to determine the image type of the given buffer
+func DetermineImageType(buf []byte) ImageType {
+	if len(buf) < 12 {
+		return ImageTypeUnknown
+	}
+	if isJPEG(buf) {
+		return ImageTypeJPEG
+	}
+	if isPNG(buf) {
+		return ImageTypePNG
+	}
+	if IsTypeSupported(ImageTypeGIF) && isGIF(buf) {
+		return ImageTypeGIF
+	}
+	if IsTypeSupported(ImageTypeTIFF) && isTIFF(buf) {
+		return ImageTypeTIFF
+	}
+	if IsTypeSupported(ImageTypeWEBP) && isWEBP(buf) {
+		return ImageTypeWEBP
+	}
+	if IsTypeSupported(ImageTypeHEIF) && isHEIF(buf) {
+		return ImageTypeHEIF
+	}
+	if IsTypeSupported(ImageTypeSVG) && isSVG(buf) {
+		return ImageTypeSVG
+	}
+	if IsTypeSupported(ImageTypePDF) && isPDF(buf) {
+		return ImageTypePDF
+	}
+
+	return ImageTypeUnknown
+}
+
+var jpeg = []byte("\xFF\xD8\xFF")
+
+func isJPEG(buf []byte) bool {
+	return bytes.HasPrefix(buf, jpeg)
+}
+
+var gif = []byte("\x47\x49\x46")
+
+func isGIF(buf []byte) bool {
+	return bytes.HasPrefix(buf, gif)
+}
+
+var png = []byte("\x89\x50\x4E\x47")
+
+func isPNG(buf []byte) bool {
+	return bytes.HasPrefix(buf, png)
+}
+
+var tifII = []byte("\x49\x49\x2A\x00")
+var tifMM = []byte("\x4D\x4D\x00\x2A")
+
+func isTIFF(buf []byte) bool {
+	return bytes.HasPrefix(buf, tifII) || bytes.HasPrefix(buf, tifMM)
+}
+
+var webp = []byte("\x57\x45\x42\x50")
+
+func isWEBP(buf []byte) bool {
+	return bytes.Equal(buf[8:12], webp)
+}
+
+// https://github.com/strukturag/libheif/blob/master/libheif/heif.cc
+var ftyp = []byte("ftyp")
+var heic = []byte("heic")
+
+func isHEIF(buf []byte) bool {
+	return bytes.Equal(buf[4:8], ftyp) && bytes.Equal(buf[8:12], heic)
+}
+
+var svg = []byte("<svg ")
+
+func isSVG(buf []byte) bool {
+	sub := buf[:int(math.Min(500.0, float64(len(buf))))]
+	return bytes.Contains(sub, svg)
+}
+
+var pdf = []byte("\x25\x50\x44\x46")
+
+func isPDF(buf []byte) bool {
+	return bytes.HasPrefix(buf, pdf)
+}
+
 func vipsLoadFromBuffer(buf []byte) (*C.VipsImage, ImageType, error) {
 	// Reference buf here so it's not garbage collected during image initialization.
 	defer runtime.KeepAlive(buf)
 
 	var out *C.VipsImage
 
-	imageType := vipsDetermineImageType(buf)
+	imageType := DetermineImageType(buf)
 	if imageType == ImageTypeUnknown {
 		if len(buf) > 2 {
 			log.Printf("Failed to understand image format size=%d %x %x %x", len(buf), buf[0], buf[1], buf[2])

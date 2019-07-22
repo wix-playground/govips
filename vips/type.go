@@ -4,19 +4,6 @@ package vips
 // #include "bridge.h"
 import "C"
 
-// ExportParams are options when exporting an image to file or buffer
-type ExportParams struct {
-	Format          ImageType
-	Quality         int
-	Compression     int
-	Interlaced      bool
-	Lossless        bool
-	StripProfile    bool
-	StripMetadata   bool
-	Interpretation  Interpretation
-	BackgroundColor *Color
-}
-
 // Color represents an RGB
 type Color struct {
 	R, G, B uint8
@@ -25,21 +12,6 @@ type Color struct {
 // ColorBlack is shorthand for black RGB
 //noinspection GoUnusedGlobalVariable
 var ColorBlack = Color{0, 0, 0}
-
-const DefaultFont = "sans 10"
-
-// LabelParams represents a text-based label
-type LabelParams struct {
-	Text      string
-	Font      string
-	Width     Scalar
-	Height    Scalar
-	OffsetX   Scalar
-	OffsetY   Scalar
-	Opacity   float32
-	Color     Color
-	Alignment Align
-}
 
 // Interpolator represents the vips interpolator types
 type Interpolator string
@@ -152,33 +124,6 @@ const (
 	AlignLow    Align = C.VIPS_ALIGN_LOW
 	AlignCenter Align = C.VIPS_ALIGN_CENTRE
 	AlignHigh   Align = C.VIPS_ALIGN_HIGH
-)
-
-// Interpretation represents VIPS_INTERPRETATION type
-type Interpretation int
-
-// Interpretation enum
-const (
-	InterpretationError     Interpretation = C.VIPS_INTERPRETATION_ERROR
-	InterpretationMultiband Interpretation = C.VIPS_INTERPRETATION_MULTIBAND
-	InterpretationBW        Interpretation = C.VIPS_INTERPRETATION_B_W
-	InterpretationHistogram Interpretation = C.VIPS_INTERPRETATION_HISTOGRAM
-	InterpretationXYZ       Interpretation = C.VIPS_INTERPRETATION_XYZ
-	InterpretationLAB       Interpretation = C.VIPS_INTERPRETATION_LAB
-	InterpretationCMYK      Interpretation = C.VIPS_INTERPRETATION_CMYK
-	InterpretationLABQ      Interpretation = C.VIPS_INTERPRETATION_LABQ
-	InterpretationRGB       Interpretation = C.VIPS_INTERPRETATION_RGB
-	InterpretationCMC       Interpretation = C.VIPS_INTERPRETATION_CMC
-	InterpretationLCH       Interpretation = C.VIPS_INTERPRETATION_LCH
-	InterpretationLABS      Interpretation = C.VIPS_INTERPRETATION_LABS
-	InterpretationSRGB      Interpretation = C.VIPS_INTERPRETATION_sRGB
-	InterpretationYXY       Interpretation = C.VIPS_INTERPRETATION_YXY
-	InterpretationFourier   Interpretation = C.VIPS_INTERPRETATION_FOURIER
-	InterpretationGB16      Interpretation = C.VIPS_INTERPRETATION_RGB16
-	InterpretationGrey16    Interpretation = C.VIPS_INTERPRETATION_GREY16
-	InterpretationMatrix    Interpretation = C.VIPS_INTERPRETATION_MATRIX
-	InterpretationScRGB     Interpretation = C.VIPS_INTERPRETATION_scRGB
-	InterpretationHSV       Interpretation = C.VIPS_INTERPRETATION_HSV
 )
 
 // BandFormat represents VIPS_FORMAT type

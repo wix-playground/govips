@@ -6,6 +6,33 @@ import "C"
 // #include "color.h"
 import "C"
 
+// Interpretation represents VIPS_INTERPRETATION type
+type Interpretation int
+
+// Interpretation enum
+const (
+	InterpretationError     Interpretation = C.VIPS_INTERPRETATION_ERROR
+	InterpretationMultiband Interpretation = C.VIPS_INTERPRETATION_MULTIBAND
+	InterpretationBW        Interpretation = C.VIPS_INTERPRETATION_B_W
+	InterpretationHistogram Interpretation = C.VIPS_INTERPRETATION_HISTOGRAM
+	InterpretationXYZ       Interpretation = C.VIPS_INTERPRETATION_XYZ
+	InterpretationLAB       Interpretation = C.VIPS_INTERPRETATION_LAB
+	InterpretationCMYK      Interpretation = C.VIPS_INTERPRETATION_CMYK
+	InterpretationLABQ      Interpretation = C.VIPS_INTERPRETATION_LABQ
+	InterpretationRGB       Interpretation = C.VIPS_INTERPRETATION_RGB
+	InterpretationCMC       Interpretation = C.VIPS_INTERPRETATION_CMC
+	InterpretationLCH       Interpretation = C.VIPS_INTERPRETATION_LCH
+	InterpretationLABS      Interpretation = C.VIPS_INTERPRETATION_LABS
+	InterpretationSRGB      Interpretation = C.VIPS_INTERPRETATION_sRGB
+	InterpretationYXY       Interpretation = C.VIPS_INTERPRETATION_YXY
+	InterpretationFourier   Interpretation = C.VIPS_INTERPRETATION_FOURIER
+	InterpretationGB16      Interpretation = C.VIPS_INTERPRETATION_RGB16
+	InterpretationGrey16    Interpretation = C.VIPS_INTERPRETATION_GREY16
+	InterpretationMatrix    Interpretation = C.VIPS_INTERPRETATION_MATRIX
+	InterpretationScRGB     Interpretation = C.VIPS_INTERPRETATION_scRGB
+	InterpretationHSV       Interpretation = C.VIPS_INTERPRETATION_HSV
+)
+
 func vipsIsColorSpaceSupported(in *C.VipsImage) bool {
 	return C.is_colorspace_supported(in) == 1
 }
