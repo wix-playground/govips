@@ -130,7 +130,7 @@ func (r *ImageRef) Bands() int {
 
 // HasProfile returns if the image has an ICC profile embedded.
 func (r *ImageRef) HasProfile() bool {
-	return vipsHasProfile(r.image)
+	return vipsHasICCProfile(r.image)
 }
 
 // HasAlpha returns if the image has an alpha layer.

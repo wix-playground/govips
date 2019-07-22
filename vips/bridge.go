@@ -103,16 +103,16 @@ func vipsExportBuffer(image *C.VipsImage, params *ExportParams) ([]byte, ImageTy
 
 	switch format {
 	case ImageTypeWEBP:
-		buf, err = saveWebPToBuffer(tmpImage, params.StripMetadata, params.Quality, params.Lossless)
+		buf, err = vipsSaveWebPToBuffer(tmpImage, params.StripMetadata, params.Quality, params.Lossless)
 	case ImageTypePNG:
-		buf, err = savePNGToBuffer(tmpImage, params.StripMetadata, params.Compression, params.Quality, params.Interlaced)
+		buf, err = vipsSavePNGToBuffer(tmpImage, params.StripMetadata, params.Compression, params.Quality, params.Interlaced)
 	case ImageTypeTIFF:
-		buf, err = saveTIFFToBuffer(tmpImage)
+		buf, err = vipsSaveTIFFToBuffer(tmpImage)
 	case ImageTypeHEIF:
-		buf, err = saveHEIFToBuffer(tmpImage, params.Quality, params.Lossless)
+		buf, err = vipsSaveHEIFToBuffer(tmpImage, params.Quality, params.Lossless)
 	default:
 		format = ImageTypeJPEG
-		buf, err = saveJPEGToBuffer(tmpImage, params.Quality, params.StripMetadata, params.Interlaced)
+		buf, err = vipsSaveJPEGToBuffer(tmpImage, params.Quality, params.StripMetadata, params.Interlaced)
 	}
 
 	if err != nil {
@@ -123,8 +123,8 @@ func vipsExportBuffer(image *C.VipsImage, params *ExportParams) ([]byte, ImageTy
 }
 
 func vipsPrepareForExport(in *C.VipsImage, params *ExportParams) (*C.VipsImage, error) {
-	if params.StripProfile && vipsHasProfile(in) {
-		C.remove_icc_profile(in)
+	if params.StripProfile {
+		vipsRemoveICCProfile(in)
 	}
 
 	if params.Quality == 0 {
@@ -143,15 +143,8 @@ func vipsPrepareForExport(in *C.VipsImage, params *ExportParams) (*C.VipsImage, 
 	interpretation := C.VipsInterpretation(params.Interpretation)
 
 	// Apply the proper colour space
-	if int(C.is_colorspace_supported(in)) == 1 && interpretation != in.Type {
-		var out *C.VipsImage
-
-		err := C.to_colorspace(in, &out, interpretation)
-		if int(err) != 0 {
-			return nil, handleImageError(out)
-		}
-
-		return out, nil
+	if vipsIsColorSpaceSupported(in) && interpretation != in.Type {
+		return vipsToColorSpace(in, params.Interpretation)
 	}
 
 	return in, nil

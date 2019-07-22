@@ -4,4 +4,5 @@
 #include <vips/vips.h>
 
 
-unsigned long has_profile_embed(VipsImage *in);
+unsigned long has_icc_profile(VipsImage *in);
+int remove_icc_profile(VipsImage *in);

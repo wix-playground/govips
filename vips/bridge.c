@@ -80,6 +80,3 @@ int label(VipsImage *in, VipsImage **out, LabelOptions *o) {
 	return 0;
 }
 
-int remove_icc_profile(VipsImage *in) {
-  return vips_image_remove(in, VIPS_META_ICC_NAME);
-}

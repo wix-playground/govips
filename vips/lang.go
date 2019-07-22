@@ -39,8 +39,5 @@ func toGboolean(b bool) C.gboolean {
 }
 
 func fromGboolean(b C.gboolean) bool {
-	if b != 0 {
-		return true
-	}
-	return false
+	return b != 0
 }
