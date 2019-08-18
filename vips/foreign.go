@@ -5,6 +5,8 @@ package vips
 import "C"
 import (
 	"bytes"
+	"golang.org/x/image/bmp"
+	"image/png"
 	"math"
 	"runtime"
 	"unsafe"
@@ -101,16 +103,16 @@ func isJPEG(buf []byte) bool {
 	return bytes.HasPrefix(buf, jpeg)
 }
 
-var gif = []byte("\x47\x49\x46")
+var gifHeader = []byte("\x47\x49\x46")
 
 func isGIF(buf []byte) bool {
-	return bytes.HasPrefix(buf, gif)
+	return bytes.HasPrefix(buf, gifHeader)
 }
 
-var png = []byte("\x89\x50\x4E\x47")
+var pngHeader = []byte("\x89\x50\x4E\x47")
 
 func isPNG(buf []byte) bool {
-	return bytes.HasPrefix(buf, png)
+	return bytes.HasPrefix(buf, pngHeader)
 }
 
 var tifII = []byte("\x49\x49\x2A\x00")
@@ -120,10 +122,10 @@ func isTIFF(buf []byte) bool {
 	return bytes.HasPrefix(buf, tifII) || bytes.HasPrefix(buf, tifMM)
 }
 
-var webp = []byte("\x57\x45\x42\x50")
+var webpHeader = []byte("\x57\x45\x42\x50")
 
 func isWEBP(buf []byte) bool {
-	return bytes.Equal(buf[8:12], webp)
+	return bytes.Equal(buf[8:12], webpHeader)
 }
 
 // https://github.com/strukturag/libheif/blob/master/libheif/heif.cc
@@ -147,29 +149,56 @@ func isPDF(buf []byte) bool {
 	return bytes.HasPrefix(buf, pdf)
 }
 
-var bmp = []byte("BM")
+var bm = []byte("BM")
 
 func isBMP(buf []byte) bool {
-	return bytes.HasPrefix(buf, bmp)
+	return bytes.HasPrefix(buf, bm)
 }
 
 func vipsLoadFromBuffer(buf []byte) (*C.VipsImage, ImageType, error) {
-	// Reference buf here so it's not garbage collected during image initialization.
-	defer runtime.KeepAlive(buf)
+	src := buf
+	// Reference src here so it's not garbage collected during image initialization.
+	defer runtime.KeepAlive(src)
 
+	var err error
 	var out *C.VipsImage
 
-	imageType := DetermineImageType(buf)
+	imageType := DetermineImageType(src)
+
+	if imageType == ImageTypeBMP {
+		src, err = bmpToPNG(src)
+		if err != nil {
+			return nil, ImageTypeUnknown, err
+		}
+
+		imageType = ImageTypePNG
+	}
+
 	if !IsTypeSupported(imageType) {
-		info("failed to understand image format size=%d", len(buf))
+		info("failed to understand image format size=%d", len(src))
 		return nil, ImageTypeUnknown, ErrUnsupportedImageFormat
 	}
 
-	if err := C.load_image_buffer(unsafe.Pointer(&buf[0]), C.size_t(len(buf)), C.int(imageType), &out); err != 0 {
+	if err := C.load_image_buffer(unsafe.Pointer(&src[0]), C.size_t(len(src)), C.int(imageType), &out); err != 0 {
 		return nil, ImageTypeUnknown, handleImageError(out)
 	}
 
 	return out, imageType, nil
+}
+
+func bmpToPNG(src []byte) ([]byte, error) {
+	i, err := bmp.Decode(bytes.NewReader(src))
+	if err != nil {
+		return nil, err
+	}
+
+	var w bytes.Buffer
+	err = png.Encode(&w, i)
+	if err != nil {
+		return nil, err
+	}
+
+	return w.Bytes(), nil
 }
 
 func vipsSavePNGToBuffer(in *C.VipsImage, stripMetadata bool, compression, quality int, interlaced bool) ([]byte, error) {
