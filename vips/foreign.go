@@ -25,6 +25,7 @@ const (
 	ImageTypeTIFF    ImageType = C.TIFF
 	ImageTypeWEBP    ImageType = C.WEBP
 	ImageTypeHEIF    ImageType = C.HEIF
+	ImageTypeBMP     ImageType = C.BMP
 )
 
 var imageTypeExtensionMap = map[ImageType]string{
@@ -37,6 +38,7 @@ var imageTypeExtensionMap = map[ImageType]string{
 	ImageTypeTIFF:   ".tiff",
 	ImageTypeWEBP:   ".webp",
 	ImageTypeHEIF:   ".heic",
+	ImageTypeBMP:    ".bmp",
 }
 
 var ImageTypes = map[ImageType]string{
@@ -49,6 +51,7 @@ var ImageTypes = map[ImageType]string{
 	ImageTypeTIFF:   "tiff",
 	ImageTypeWEBP:   "webp",
 	ImageTypeHEIF:   "heif",
+	ImageTypeBMP:    "bmp",
 }
 
 // FileExt returns the canonical extension for the ImageType
@@ -85,6 +88,8 @@ func DetermineImageType(buf []byte) ImageType {
 		return ImageTypeSVG
 	} else if isPDF(buf) {
 		return ImageTypePDF
+	} else if isBMP(buf) {
+		return ImageTypeBMP
 	} else {
 		return ImageTypeUnknown
 	}
@@ -140,6 +145,12 @@ var pdf = []byte("\x25\x50\x44\x46")
 
 func isPDF(buf []byte) bool {
 	return bytes.HasPrefix(buf, pdf)
+}
+
+var bmp = []byte("BM")
+
+func isBMP(buf []byte) bool {
+	return bytes.HasPrefix(buf, bmp)
 }
 
 func vipsLoadFromBuffer(buf []byte) (*C.VipsImage, ImageType, error) {
