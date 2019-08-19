@@ -149,10 +149,10 @@ func isPDF(buf []byte) bool {
 	return bytes.HasPrefix(buf, pdf)
 }
 
-var bm = []byte("BM")
+var bmpHeader = []byte("BM")
 
 func isBMP(buf []byte) bool {
-	return bytes.HasPrefix(buf, bm)
+	return bytes.HasPrefix(buf, bmpHeader)
 }
 
 func vipsLoadFromBuffer(buf []byte) (*C.VipsImage, ImageType, error) {
