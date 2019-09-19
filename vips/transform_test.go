@@ -15,6 +15,18 @@ func TestTransform_Resize(t *testing.T) {
 	})
 }
 
+func TestTransform_BMP__Alpha(t *testing.T) {
+	goldenTest(t, resources+"with-alpha.bmp", func(tx *Transform) {
+		tx.AutoRotate()
+	})
+}
+
+func TestTransform_HEIC__Resize(t *testing.T) {
+	goldenTest(t, resources+"citron.heic", func(tx *Transform) {
+		tx.Resize(512, 256)
+	})
+}
+
 func TestTransform_Flatten(t *testing.T) {
 	goldenTest(t, resources+"shapes.png", func(tx *Transform) {
 		tx.BackgroundColor(&Color{R: 255, G: 192, B: 203})
