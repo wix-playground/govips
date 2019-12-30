@@ -149,8 +149,14 @@ func TestTransform_MaxScale(t *testing.T) {
 	})
 }
 
-func TestTransform_Scale_Alpha(t *testing.T) {
+func TestTransform_Scale_Alpha_1(t *testing.T) {
 	goldenTest(t, resources+"logo_alpha.png", func(tx *Transform) {
+		tx.Scale(0.4)
+	})
+}
+
+func TestTransform_Scale_Alpha_2(t *testing.T) {
+	goldenTest(t, resources+"logo_alpha_2.png", func(tx *Transform) {
 		tx.Scale(0.4)
 	})
 }
