@@ -21,7 +21,7 @@ int icc_transform(VipsImage *in, VipsImage **out, int isCmyk) {
     	if (isCmyk == 1) {
     		result = vips_icc_transform(in, out, srgb_profile_path, "input_profile", "cmyk", "intent", VIPS_INTENT_PERCEPTUAL, NULL);
     	} else {
-        result = vips_icc_transfor:qm(in, out, srgb_profile_path, "embedded", TRUE, "intent", VIPS_INTENT_PERCEPTUAL, NULL);
+        result = vips_icc_transform(in, out, srgb_profile_path, "embedded", TRUE, "intent", VIPS_INTENT_PERCEPTUAL, NULL);
     	}
     } else {
         result = vips_icc_transform(in, out, grey_profile_path, "input_profile", grey_profile_path, "embedded", TRUE, "intent", VIPS_INTENT_PERCEPTUAL, NULL);
