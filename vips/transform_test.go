@@ -192,6 +192,12 @@ func TestTransform_Rotate(t *testing.T) {
 	})
 }
 
+func TestTransform_ResizeGrayScaleWithIccProfile(t *testing.T) {
+	goldenTest(t, resources+"jpg-8bit-gray-scale-with-icc-profile.jpg", func(tx *Transform) {
+		tx.Resize(640, 416)
+	})
+}
+
 func goldenTest(t *testing.T, file string, fn func(t *Transform)) []byte {
 	if testing.Short() {
 		return nil
