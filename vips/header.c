@@ -24,7 +24,7 @@ int icc_transform(VipsImage *in, VipsImage **out, int isCmyk) {
         result = vips_icc_transform(in, out, srgb_profile_path, "embedded", TRUE, "intent", VIPS_INTENT_PERCEPTUAL, NULL);
     	}
     } else {
-        result = vips_icc_transform(in, out, gray_profile_path, "input_profile", gray_profile_path, "embedded", TRUE, "intent", VIPS_INTENT_PERCEPTUAL, NULL);
+			result = vips_icc_transform(in, out, gray_profile_path, "input_profile", gray_profile_path, "embedded", TRUE, "intent", VIPS_INTENT_PERCEPTUAL, NULL);
     }
 
     return result;
