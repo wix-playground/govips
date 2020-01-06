@@ -198,6 +198,12 @@ func TestTransform_ResizeGrayScaleWithIccProfile(t *testing.T) {
 	})
 }
 
+func TestTransform_CmykResizeGrayScaleWithIccProfile(t *testing.T) {
+	goldenTest(t, resources+"jpg-32bit-cmyk-icc-profile-gray.jpg", func(tx *Transform) {
+		tx.Resize(640, 416)
+	})
+}
+
 func goldenTest(t *testing.T, file string, fn func(t *Transform)) []byte {
 	if testing.Short() {
 		return nil
