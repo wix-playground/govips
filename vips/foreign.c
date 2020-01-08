@@ -1,5 +1,6 @@
 #include "lang.h"
 #include "foreign.h"
+#include <stdio.h>
 
 int load_image_buffer(void *buf, size_t len, int imageType, VipsImage **out) {
 	int code = 1;

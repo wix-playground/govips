@@ -1,0 +1,221 @@
+package vips
+
+import (
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"io/ioutil"
+	"strings"
+	"testing"
+)
+
+func TestImage_Resize_Downscale(t *testing.T) {
+	goldenTest(t, resources+"jpg-24bit.jpg", nil, func(img *ImageRef) error {
+		return img.Resize(0.9, KernelLanczos3)
+	})
+}
+
+func TestImage_Resize_Upscale(t *testing.T) {
+	goldenTest(t, resources+"jpg-24bit.jpg", nil, func(img *ImageRef) error {
+		return img.Resize(1.1, KernelLanczos3)
+	})
+}
+
+func TestImage_Resize_Downscale_Alpha(t *testing.T) {
+	goldenTest(t, resources+"png-8bit+alpha.png", nil, func(img *ImageRef) error {
+		return img.Resize(0.9, KernelLanczos3)
+	})
+}
+
+func TestImage_Resize_Upscale_Alpha(t *testing.T) {
+	goldenTest(t, resources+"png-8bit+alpha.png", nil, func(img *ImageRef) error {
+		return img.Resize(1.1, KernelLanczos3)
+	})
+}
+
+func TestImage_OptimizeICCProfile_CMYK(t *testing.T) {
+	goldenTest(t, resources+"jpg-32bit-cmyk-icc-swop.jpg", nil, func(img *ImageRef) error {
+		return img.OptimizeICCProfile()
+	})
+}
+
+func TestImage_OptimizeICCProfile_RGB_No_Profile(t *testing.T) {
+	goldenTest(t, resources+"jpg-24bit.jpg", nil, func(img *ImageRef) error {
+		return img.OptimizeICCProfile()
+	})
+}
+
+func TestImage_OptimizeICCProfile_RGB_Embedded(t *testing.T) {
+	goldenTest(t, resources+"jpg-24bit-icc-adobe-rgb.jpg", nil, func(img *ImageRef) error {
+		return img.OptimizeICCProfile()
+	})
+}
+
+func TestImage_OptimizeICCProfile_Grey(t *testing.T) {
+	goldenTest(t, resources+"jpg-8bit-gray-scale-with-icc-profile.jpg", nil, func(img *ImageRef) error {
+		return img.OptimizeICCProfile()
+	})
+}
+
+func TestImage_RemoveICCProfile(t *testing.T) {
+	goldenTest(t, resources+"jpg-24bit-icc-smpte.jpg", nil, func(img *ImageRef) error {
+		return img.RemoveICCProfile()
+	})
+}
+
+func TestImage_RemoveMetadata(t *testing.T) {
+	goldenTest(t, resources+"heic-24bit-exif.heic", nil, func(img *ImageRef) error {
+		return img.RemoveMetadata()
+	})
+}
+
+func TestImageRef_RemoveMetadata_Leave_Orientation(t *testing.T) {
+	goldenTest(t, resources+"jpg-orientation-5.jpg", nil, func(img *ImageRef) error {
+		return img.RemoveMetadata()
+	})
+}
+
+func TestImageRef_RemoveMetadata_Leave_Profile(t *testing.T) {
+	goldenTest(t, resources+"jpg-8bit-grey-icc-dot-gain.jpg", nil, func(img *ImageRef) error {
+		return img.RemoveMetadata()
+	})
+}
+
+func TestImage_AutoRotate_0(t *testing.T) {
+	goldenTest(t, resources+"png-24bit.png", nil, func(img *ImageRef) error {
+		return img.AutoRotate()
+	})
+}
+
+func TestImage_AutoRotate_1(t *testing.T) {
+	goldenTest(t, resources+"jpg-24bit-icc-iec.jpg", nil, func(img *ImageRef) error {
+		return img.AutoRotate()
+	})
+}
+
+func TestImage_AutoRotate_5(t *testing.T) {
+	goldenTest(t, resources+"jpg-orientation-5.jpg", nil, func(img *ImageRef) error {
+		return img.AutoRotate()
+	})
+}
+
+func TestImage_AutoRotate_6(t *testing.T) {
+	goldenTest(t, resources+"jpg-orientation-6.jpg", nil, func(img *ImageRef) error {
+		return img.AutoRotate()
+	})
+}
+
+func TestImage_Sharpen_24bit_Alpha(t *testing.T) {
+	goldenTest(t, resources+"png-24bit+alpha.png", nil, func(img *ImageRef) error {
+		//usm_0.66_1.00_0.01
+		sigma := 1 + (0.66 / 2)
+		x1 := 0.01 * 100
+		m2 := 1.0
+
+		return img.Sharpen(sigma, x1, m2)
+	})
+}
+
+func TestImage_Sharpen_8bit_Alpha(t *testing.T) {
+	goldenTest(t, resources+"png-8bit+alpha.png", nil, func(img *ImageRef) error {
+		//usm_0.66_1.00_0.01
+		sigma := 1 + (0.66 / 2)
+		x1 := 0.01 * 100
+		m2 := 1.0
+
+		return img.Sharpen(sigma, x1, m2)
+	})
+}
+
+func TestImage_Modulate(t *testing.T) {
+	goldenTest(t, resources+"jpg-24bit-icc-iec.jpg", nil, func(img *ImageRef) error {
+		return img.Modulate(0.7, 0.5, 180)
+	})
+}
+
+func TestImage_Modulate_Alpha(t *testing.T) {
+	goldenTest(t, resources+"png-24bit+alpha.png", nil, func(img *ImageRef) error {
+		return img.Modulate(1.1, 1.2, 0)
+	})
+}
+
+func TestImage_ModulateHSV(t *testing.T) {
+	goldenTest(t, resources+"jpg-24bit-icc-iec.jpg", nil, func(img *ImageRef) error {
+		return img.ModulateHSV(0.7, 0.5, 180)
+	})
+}
+
+func TestImage_ModulateHSV_Alpha(t *testing.T) {
+	goldenTest(t, resources+"png-24bit+alpha.png", nil, func(img *ImageRef) error {
+		return img.ModulateHSV(1.1, 1.2, 120)
+	})
+}
+
+func TestImage_ExtractArea(t *testing.T) {
+	goldenTest(t, resources+"jpg-24bit-icc-iec.jpg", nil, func(img *ImageRef) error {
+		return img.ExtractArea(10, 20, 200, 100)
+	})
+}
+
+func TestImage_Rotate(t *testing.T) {
+	goldenTest(t, resources+"jpg-24bit-icc-iec.jpg", nil, func(img *ImageRef) error {
+		return img.Rotate(Angle90)
+	})
+}
+
+func TestImageRef_Linear1(t *testing.T) {
+	goldenTest(t, resources+"png-24bit.png", nil, func(img *ImageRef) error {
+		return img.Linear1(3, 4)
+	})
+}
+
+func TestImageRef_Linear_Alpha(t *testing.T) {
+	goldenTest(t, resources+"png-24bit+alpha.png", nil, func(img *ImageRef) error {
+		return img.Linear([]float64{1.1, 1.2, 1.3, 1.4}, []float64{1, 2, 3, 4})
+	})
+}
+
+func goldenTest(t *testing.T, file string, params *ExportParams, fn func(img *ImageRef) error) []byte {
+	Startup(nil)
+
+	i, err := NewImageFromFile(file)
+	require.NoError(t, err)
+	defer i.Close()
+
+	err = fn(i)
+	require.NoError(t, err)
+
+	buf, _, err := i.Export(params)
+	require.NoError(t, err)
+	assertGoldenMatch(t, file, buf)
+
+	return buf
+}
+
+func assertGoldenMatch(t *testing.T, file string, buf []byte) {
+	i := strings.LastIndex(file, ".")
+	if i < 0 {
+		panic("bad filename")
+	}
+
+	name := strings.Replace(t.Name(), "/", "_", -1)
+	name = strings.Replace(name, "TestImage_", "", -1)
+	prefix := file[:i] + "." + name
+	ext := file[i:]
+	goldenFile := prefix + ".golden" + ext
+
+	golden, _ := ioutil.ReadFile(goldenFile)
+	if golden != nil {
+		if !assert.Equal(t, golden, buf) {
+			failed := prefix + ".failed" + ext
+			err := ioutil.WriteFile(failed, buf, 0666)
+			if err != nil {
+				panic(err)
+			}
+		}
+		return
+	}
+
+	t.Log("writing golden file: " + goldenFile)
+	err := ioutil.WriteFile(goldenFile, buf, 0644)
+	assert.NoError(t, err)
+}
