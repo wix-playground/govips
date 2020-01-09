@@ -223,7 +223,8 @@ func TestImageRef_RemoveOrientation__HasEXIF(t *testing.T) {
 	require.NoError(t, err)
 	defer image.Close()
 
-	image.RemoveOrientation()
+	err = image.RemoveOrientation()
+	require.NoError(t, err)
 
 	assert.Equal(t, 0, image.GetOrientation())
 }
@@ -235,7 +236,8 @@ func TestImageRef_RemoveOrientation__NoEXIF(t *testing.T) {
 	require.NoError(t, err)
 	defer image.Close()
 
-	image.RemoveOrientation()
+	err = image.RemoveOrientation()
+	require.NoError(t, err)
 
 	assert.Equal(t, 0, image.GetOrientation())
 }
