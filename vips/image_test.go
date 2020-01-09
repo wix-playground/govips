@@ -216,6 +216,32 @@ func TestImageRef_GetOrientation__NoEXIF(t *testing.T) {
 	assert.Equal(t, 0, image.GetOrientation())
 }
 
+func TestImageRef_SetOrientation__HasEXIF(t *testing.T) {
+	Startup(nil)
+
+	image, err := NewImageFromFile(resources + "jpg-orientation-6.jpg")
+	require.NoError(t, err)
+	defer image.Close()
+
+	err = image.SetOrientation(5)
+	require.NoError(t, err)
+
+	assert.Equal(t, 5, image.GetOrientation())
+}
+
+func TestImageRef_SetOrientation__NoEXIF(t *testing.T) {
+	Startup(nil)
+
+	image, err := NewImageFromFile(resources + "png-24bit.png")
+	require.NoError(t, err)
+	defer image.Close()
+
+	err = image.SetOrientation(5)
+	require.NoError(t, err)
+
+	assert.Equal(t, 5, image.GetOrientation())
+}
+
 func TestImageRef_RemoveOrientation__HasEXIF(t *testing.T) {
 	Startup(nil)
 
