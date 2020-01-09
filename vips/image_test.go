@@ -97,8 +97,8 @@ func TestImageRef_Error(t *testing.T) {
 
 	src := bytes.NewReader(srcBytes)
 	img, err := NewImageFromReader(src)
-	assert.Error(t, err)
-	assert.Nil(t, img)
+	assert.NoError(t, err)
+	assert.NotNil(t, img)
 }
 
 func TestImageRef_Resize__Error(t *testing.T) {
@@ -193,8 +193,7 @@ func TestImageRef_HasProfile__False(t *testing.T) {
 	require.NoError(t, err)
 	defer img.Close()
 
-	got := img.HasProfile()
-	assert.False(t, got)
+	assert.False(t, img.HasProfile())
 }
 
 func TestImageRef_GetOrientation__HasEXIF(t *testing.T) {
@@ -204,9 +203,7 @@ func TestImageRef_GetOrientation__HasEXIF(t *testing.T) {
 	require.NoError(t, err)
 	defer image.Close()
 
-	o := image.GetOrientation()
-
-	assert.Equal(t, 6, o)
+	assert.Equal(t, 6, image.GetOrientation())
 }
 
 func TestImageRef_GetOrientation__NoEXIF(t *testing.T) {
@@ -216,9 +213,7 @@ func TestImageRef_GetOrientation__NoEXIF(t *testing.T) {
 	require.NoError(t, err)
 	defer image.Close()
 
-	o := image.GetOrientation()
-
-	assert.Equal(t, 0, o)
+	assert.Equal(t, 0, image.GetOrientation())
 }
 
 func TestImageRef_RemoveOrientation__HasEXIF(t *testing.T) {
@@ -230,9 +225,7 @@ func TestImageRef_RemoveOrientation__HasEXIF(t *testing.T) {
 
 	image.RemoveOrientation()
 
-	o := image.GetOrientation()
-
-	assert.Equal(t, 0, o)
+	assert.Equal(t, 0, image.GetOrientation())
 }
 
 func TestImageRef_RemoveOrientation__NoEXIF(t *testing.T) {
@@ -244,9 +237,20 @@ func TestImageRef_RemoveOrientation__NoEXIF(t *testing.T) {
 
 	image.RemoveOrientation()
 
-	o := image.GetOrientation()
+	assert.Equal(t, 0, image.GetOrientation())
+}
 
-	assert.Equal(t, 0, o)
+func TestImageRef_RemoveMetadata(t *testing.T) {
+	Startup(nil)
+
+	image, err := NewImageFromFile(resources + "jpg-24bit-icc-adobe-rgb.jpg")
+	require.NoError(t, err)
+	defer image.Close()
+
+	err = image.RemoveMetadata()
+	require.NoError(t, err)
+
+	assert.True(t, image.HasICCProfile())
 }
 
 func TestImageRef_Close(t *testing.T) {

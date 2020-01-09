@@ -451,8 +451,14 @@ func (r *ImageRef) OptimizeICCProfile() error {
 
 // won't remove the ICC profile
 func (r *ImageRef) RemoveMetadata() error {
-	vipsRemoveMetadata(r.image)
-	// this works in place on the header
+	out, err := vipsCopyImage(r.image)
+	if err != nil {
+		return err
+	}
+
+	vipsRemoveMetadata(out)
+
+	r.setImage(out)
 	return nil
 }
 
