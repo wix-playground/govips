@@ -14,7 +14,10 @@ void remove_metadata(VipsImage *in) {
     gchar ** fields = vips_image_get_fields(in);
 
     for (int i=0; fields[i] != NULL; i++) {
-        if (strncmp(fields[i], VIPS_META_ICC_NAME, 16) && strncmp(fields[i], VIPS_META_ORIENTATION, 16)) {
+        if (
+        strncmp(fields[i], VIPS_META_ICC_NAME, sizeof(VIPS_META_ICC_NAME)) &&
+        strncmp(fields[i], VIPS_META_ORIENTATION, sizeof(VIPS_META_ORIENTATION))
+        ) {
             vips_image_remove(in, fields[i]);
         }
     }
