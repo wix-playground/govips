@@ -253,6 +253,19 @@ func TestImageRef_RemoveMetadata(t *testing.T) {
 	assert.True(t, image.HasICCProfile())
 }
 
+func TestImageRef_RemoveICCProfile(t *testing.T) {
+	Startup(nil)
+
+	image, err := NewImageFromFile(resources + "jpg-24bit-icc-adobe-rgb.jpg")
+	require.NoError(t, err)
+	defer image.Close()
+
+	err = image.RemoveICCProfile()
+	require.NoError(t, err)
+
+	assert.False(t, image.HasICCProfile())
+}
+
 func TestImageRef_Close(t *testing.T) {
 	Startup(nil)
 

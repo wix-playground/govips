@@ -419,8 +419,14 @@ func (r *ImageRef) ExtractArea(left int, top int, width int, height int) error {
 }
 
 func (r *ImageRef) RemoveICCProfile() error {
-	vipsRemoveICCProfile(r.image)
-	// this works in place on the header
+	out, err := vipsCopyImage(r.image)
+	if err != nil {
+		return err
+	}
+
+	vipsRemoveICCProfile(out)
+
+	r.setImage(out)
 	return nil
 }
 
