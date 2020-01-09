@@ -15,7 +15,7 @@ int optimize_icc_profile(VipsImage *in, VipsImage **out, int isCmyk) {
 	// todo: check current embedded profile, and skip if already set
 
     char *srgb_profile_path = SRGB_V2_MICRO_ICC_PATH;
-    char *gray_profile_path = SGRAY_V2_MICRO_ICC_PATH;  // GENERIC_GRAY_GAMMA_2_2_ICC_PATH
+    char *gray_profile_path = SGRAY_V2_MICRO_ICC_PATH;
 
     int channels = vips_image_get_bands(in);
 	int result;
