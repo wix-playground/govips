@@ -89,7 +89,7 @@ func TestImageRef_BMP(t *testing.T) {
 	assert.Equal(t, ImageTypePNG, metadata.Format)
 }
 
-func TestImageRef_Error(t *testing.T) {
+func TestImageRef_OverSizedMetadata(t *testing.T) {
 	Startup(nil)
 
 	srcBytes, err := ioutil.ReadFile(resources + "png-bad-metadata.png")
