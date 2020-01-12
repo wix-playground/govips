@@ -159,6 +159,10 @@ func (r *ImageRef) HasICCProfile() bool {
 	return r.HasProfile()
 }
 
+func (r *ImageRef) HasIPTC() bool {
+	return vipsHasICPTC(r.image)
+}
+
 // HasAlpha returns if the image has an alpha layer.
 func (r *ImageRef) HasAlpha() bool {
 	return vipsHasAlpha(r.image)
