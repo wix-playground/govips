@@ -242,10 +242,40 @@ func TestImageRef_Linear_Alpha(t *testing.T) {
 	}, nil, nil)
 }
 
+func TestImageRef_Animated_GIF_to_GIF(t *testing.T) {
+	goldenTest(t, resources+"gif-animated.gif", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeGIF,
+	})
+}
+
+func TestImageRef_Animated_GIF_to_WebP(t *testing.T) {
+	goldenTest(t, resources+"gif-animated.gif", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeWEBP,
+	})
+}
+
+func TestImageRef_Animated_GIF_to_JPEG__Single_Page(t *testing.T) {
+	goldenTest(t, resources+"gif-animated.gif", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeJPEG,
+	})
+}
+
 func goldenTest(t *testing.T, file string, exec func(img *ImageRef) error, validate func(img *ImageRef), params *ExportParams) []byte {
 	Startup(nil)
 
-	i, err := NewImageFromFile(file)
+	var i *ImageRef
+	var err error
+	if params != nil && (params.Format == ImageTypeWEBP || params.Format == ImageTypeHEIF || params.Format == ImageTypeGIF) {
+		i, err = NewAnimatedImageFromFile(file, -1)
+	} else {
+		i, err = NewImageFromFile(file)
+	}
 	require.NoError(t, err)
 	defer i.Close()
 
@@ -255,6 +285,11 @@ func goldenTest(t *testing.T, file string, exec func(img *ImageRef) error, valid
 	buf, _, err := i.Export(params)
 	require.NoError(t, err)
 
+	ext := ""
+	if params != nil && params.Format != ImageTypeUnknown {
+		ext = imageTypeExtensionMap[params.Format]
+	}
+
 	if validate != nil {
 		result, err := NewImageFromBuffer(buf)
 		require.NoError(t, err)
@@ -263,12 +298,12 @@ func goldenTest(t *testing.T, file string, exec func(img *ImageRef) error, valid
 		validate(result)
 	}
 
-	assertGoldenMatch(t, file, buf)
+	assertGoldenMatch(t, file, buf, ext)
 
 	return buf
 }
 
-func assertGoldenMatch(t *testing.T, file string, buf []byte) {
+func assertGoldenMatch(t *testing.T, file string, buf []byte, ext string) {
 	i := strings.LastIndex(file, ".")
 	if i < 0 {
 		panic("bad filename")
@@ -277,7 +312,9 @@ func assertGoldenMatch(t *testing.T, file string, buf []byte) {
 	name := strings.Replace(t.Name(), "/", "_", -1)
 	name = strings.Replace(name, "TestImage_", "", -1)
 	prefix := file[:i] + "." + name
-	ext := file[i:]
+	if ext == "" {
+		ext = file[i:]
+	}
 	goldenFile := prefix + ".golden" + ext
 
 	golden, _ := ioutil.ReadFile(goldenFile)

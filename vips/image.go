@@ -41,9 +41,10 @@ type ImageMetadata struct {
 	Height      int
 	Colorspace  Interpretation
 	Orientation int
+	Pages       int
 }
 
-// ExportParams are options when exporting an image to file or buffer
+// ExportParams are options when exporting the image
 type ExportParams struct {
 	Format      ImageType
 	Quality     int
@@ -52,7 +53,6 @@ type ExportParams struct {
 	Lossless    bool
 }
 
-// NewImageFromReader loads an ImageRef from the given reader
 func NewImageFromReader(r io.Reader) (*ImageRef, error) {
 	buf, err := ioutil.ReadAll(r)
 	if err != nil {
@@ -62,7 +62,15 @@ func NewImageFromReader(r io.Reader) (*ImageRef, error) {
 	return NewImageFromBuffer(buf)
 }
 
-// NewImageFromFile loads an image from file and creates a new ImageRef
+func NewAnimatedImageFromReader(r io.Reader, pages int) (*ImageRef, error) {
+	buf, err := ioutil.ReadAll(r)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewAnimatedImageFromBuffer(buf, pages)
+}
+
 func NewImageFromFile(file string) (*ImageRef, error) {
 	buf, err := ioutil.ReadFile(file)
 	if err != nil {
@@ -72,11 +80,30 @@ func NewImageFromFile(file string) (*ImageRef, error) {
 	return NewImageFromBuffer(buf)
 }
 
-// NewImageFromBuffer loads an image buffer and creates a new Image
+func NewAnimatedImageFromFile(file string, pages int) (*ImageRef, error) {
+	buf, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewAnimatedImageFromBuffer(buf, pages)
+}
+
 func NewImageFromBuffer(buf []byte) (*ImageRef, error) {
+	return NewAnimatedImageFromBuffer(buf, 1)
+}
+
+// if pages is smaller than 1 all pages are loaded
+// if pages is greater than the pages in the image an error is returned
+// if the image is not animated this is equivalent of calling NewImageFromBuffer()
+func NewAnimatedImageFromBuffer(buf []byte, pages int) (*ImageRef, error) {
 	startupIfNeeded()
 
-	image, format, err := vipsLoadFromBuffer(buf)
+	if pages < 1 {
+		pages = -1
+	}
+
+	image, format, err := vipsLoadFromBuffer(buf, pages)
 	if err != nil {
 		return nil, err
 	}
@@ -88,31 +115,13 @@ func NewImageFromBuffer(buf []byte) (*ImageRef, error) {
 
 func (r *ImageRef) Metadata() *ImageMetadata {
 	return &ImageMetadata{
-		Format: r.Format(),
-		Width:  r.Width(),
-		Height: r.Height(),
+		Format:      r.Format(),
+		Width:       r.Width(),
+		Height:      r.Height(),
+		Colorspace:  r.ColorSpace(),
+		Orientation: r.Orientation(),
+		Pages:       r.Pages(),
 	}
-}
-
-// create a new ref
-// deprecated
-func (r *ImageRef) Copy() (*ImageRef, error) {
-	out, err := vipsCopyImage(r.image)
-	if err != nil {
-		return nil, err
-	}
-
-	return newImageRef(out, r.format, r.buf), nil
-}
-
-func newImageRef(vipsImage *C.VipsImage, format ImageType, buf []byte) *ImageRef {
-	image := &ImageRef{
-		image:  vipsImage,
-		format: format,
-		buf:    buf,
-	}
-
-	return image
 }
 
 // Close closes an image and frees internal memory associated with it
@@ -149,6 +158,11 @@ func (r *ImageRef) Bands() int {
 	return int(r.image.Bands)
 }
 
+// Pages returns the number of pages (frames) for this image
+func (r *ImageRef) Pages() int {
+	return vipsGetPagesNumber(r.image)
+}
+
 // HasProfile returns if the image has an ICC profile embedded.
 func (r *ImageRef) HasProfile() bool {
 	return vipsHasICCProfile(r.image)
@@ -160,7 +174,7 @@ func (r *ImageRef) HasICCProfile() bool {
 }
 
 func (r *ImageRef) HasIPTC() bool {
-	return vipsHasICPTC(r.image)
+	return vipsHasIPTC(r.image)
 }
 
 // HasAlpha returns if the image has an alpha layer.
@@ -169,8 +183,14 @@ func (r *ImageRef) HasAlpha() bool {
 }
 
 // Return the orientation number as appears in the EXIF, if present
-func (r *ImageRef) GetOrientation() int {
+func (r *ImageRef) Orientation() int {
 	return vipsGetMetaOrientation(r.image)
+}
+
+// Return the orientation number as appears in the EXIF, if present
+// Deprecated: use Orientation instead
+func (r *ImageRef) GetOrientation() int {
+	return r.Orientation()
 }
 
 func (r *ImageRef) SetOrientation(orientation int) error {
@@ -263,7 +283,8 @@ func (r *ImageRef) Export(params *ExportParams) ([]byte, *ImageMetadata, error) 
 		Width:       r.Width(),
 		Height:      r.Height(),
 		Colorspace:  r.ColorSpace(),
-		Orientation: r.GetOrientation(),
+		Orientation: r.Orientation(),
+		Pages:       r.Pages(),
 	}
 
 	return buf, metadata, nil
@@ -409,7 +430,7 @@ func GetRotationAngleFromExif(orientation int) (Angle, bool) {
 func (r *ImageRef) AutoRotate() error {
 	// this is a full implementation of auto rotate as vips doesn't support auto rotating of mirrors exifs
 	// https://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-autorot
-	angle, flipped := GetRotationAngleFromExif(r.GetOrientation())
+	angle, flipped := GetRotationAngleFromExif(r.Orientation())
 	if flipped {
 		err := r.Flip(DirectionHorizontal)
 		if err != nil {
@@ -740,6 +761,8 @@ func (r *ImageRef) exportBuffer(params *ExportParams) ([]byte, ImageType, error)
 		buf, err = vipsSaveTIFFToBuffer(r.image)
 	case ImageTypeHEIF:
 		buf, err = vipsSaveHEIFToBuffer(r.image, params.Quality, params.Lossless)
+	case ImageTypeGIF:
+		buf, err = vipsSaveGIFToBuffer(r.image)
 	default:
 		format = ImageTypeJPEG
 		buf, err = vipsSaveJPEGToBuffer(r.image, params.Quality, false, params.Interlaced)
@@ -759,6 +782,16 @@ func vipsHasAlpha(in *C.VipsImage) bool {
 }
 
 //////////////
+
+func newImageRef(vipsImage *C.VipsImage, format ImageType, buf []byte) *ImageRef {
+	image := &ImageRef{
+		image:  vipsImage,
+		format: format,
+		buf:    buf,
+	}
+
+	return image
+}
 
 func clearImage(ref *C.VipsImage) {
 	C.clear_image(&ref)

@@ -12,7 +12,7 @@ func vipsRemoveICCProfile(in *C.VipsImage) bool {
 	return fromGboolean(C.remove_icc_profile(in))
 }
 
-func vipsHasICPTC(in *C.VipsImage) bool {
+func vipsHasIPTC(in *C.VipsImage) bool {
 	return int(C.has_iptc(in)) != 0
 }
 
@@ -30,4 +30,8 @@ func vipsRemoveMetaOrientation(in *C.VipsImage) {
 
 func vipsSetMetaOrientation(in *C.VipsImage, orientation int) {
 	C.set_meta_orientation(in, C.int(orientation))
+}
+
+func vipsGetPagesNumber(in *C.VipsImage) int {
+	return int(C.get_pages_number(in))
 }

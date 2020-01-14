@@ -10,6 +10,26 @@ import (
 )
 
 // todo: add missing tests...
+func TestImageRef_Animated_GIF(t *testing.T) {
+	Startup(nil)
+
+	srcBytes, err := ioutil.ReadFile(resources + "gif-animated.gif")
+	require.NoError(t, err)
+
+	src := bytes.NewReader(srcBytes)
+	img, err := NewImageFromReader(src)
+	require.NoError(t, err)
+	defer img.Close()
+
+	if assert.NoError(t, err) {
+		assert.NotNil(t, img)
+		// check random access by encoding twice
+		_, _, err = img.Export(nil)
+		assert.NoError(t, err)
+		_, _, err = img.Export(nil)
+		assert.NoError(t, err)
+	}
+}
 
 func TestImageRef_PNG(t *testing.T) {
 	Startup(nil)
@@ -220,7 +240,7 @@ func TestImageRef_GetOrientation__HasEXIF(t *testing.T) {
 	require.NoError(t, err)
 	defer image.Close()
 
-	assert.Equal(t, 6, image.GetOrientation())
+	assert.Equal(t, 6, image.Orientation())
 }
 
 func TestImageRef_GetOrientation__NoEXIF(t *testing.T) {
@@ -230,7 +250,7 @@ func TestImageRef_GetOrientation__NoEXIF(t *testing.T) {
 	require.NoError(t, err)
 	defer image.Close()
 
-	assert.Equal(t, 0, image.GetOrientation())
+	assert.Equal(t, 0, image.Orientation())
 }
 
 func TestImageRef_SetOrientation__HasEXIF(t *testing.T) {
@@ -243,7 +263,7 @@ func TestImageRef_SetOrientation__HasEXIF(t *testing.T) {
 	err = image.SetOrientation(5)
 	require.NoError(t, err)
 
-	assert.Equal(t, 5, image.GetOrientation())
+	assert.Equal(t, 5, image.Orientation())
 }
 
 func TestImageRef_SetOrientation__NoEXIF(t *testing.T) {
@@ -256,7 +276,7 @@ func TestImageRef_SetOrientation__NoEXIF(t *testing.T) {
 	err = image.SetOrientation(5)
 	require.NoError(t, err)
 
-	assert.Equal(t, 5, image.GetOrientation())
+	assert.Equal(t, 5, image.Orientation())
 }
 
 func TestImageRef_RemoveOrientation__HasEXIF(t *testing.T) {
@@ -269,7 +289,7 @@ func TestImageRef_RemoveOrientation__HasEXIF(t *testing.T) {
 	err = image.RemoveOrientation()
 	require.NoError(t, err)
 
-	assert.Equal(t, 0, image.GetOrientation())
+	assert.Equal(t, 0, image.Orientation())
 }
 
 func TestImageRef_RemoveOrientation__NoEXIF(t *testing.T) {
@@ -282,7 +302,7 @@ func TestImageRef_RemoveOrientation__NoEXIF(t *testing.T) {
 	err = image.RemoveOrientation()
 	require.NoError(t, err)
 
-	assert.Equal(t, 0, image.GetOrientation())
+	assert.Equal(t, 0, image.Orientation())
 }
 
 func TestImageRef_RemoveMetadata__RetainsProfile(t *testing.T) {
@@ -311,7 +331,7 @@ func TestImageRef_RemoveMetadata__RetainsOrientation(t *testing.T) {
 	err = image.RemoveMetadata()
 	require.NoError(t, err)
 
-	assert.Equal(t, 5, image.GetOrientation())
+	assert.Equal(t, 5, image.Orientation())
 }
 
 func TestImageRef_RemoveICCProfile(t *testing.T) {
@@ -328,6 +348,26 @@ func TestImageRef_RemoveICCProfile(t *testing.T) {
 
 	assert.False(t, image.HasICCProfile())
 	assert.True(t, image.HasIPTC())
+}
+
+func TestImageRef_Pages_Animated(t *testing.T) {
+	Startup(nil)
+
+	image, err := NewImageFromFile(resources + "gif-animated.gif")
+	require.NoError(t, err)
+	defer image.Close()
+
+	assert.Equal(t, 10, image.Pages())
+}
+
+func TestImageRef_Not_Animated(t *testing.T) {
+	Startup(nil)
+
+	image, err := NewImageFromFile(resources + "jpg-24bit.jpg")
+	require.NoError(t, err)
+	defer image.Close()
+
+	assert.Equal(t, 1, image.Pages())
 }
 
 func TestImageRef_Close(t *testing.T) {

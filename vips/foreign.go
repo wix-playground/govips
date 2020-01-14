@@ -157,7 +157,7 @@ func isBMP(buf []byte) bool {
 	return bytes.HasPrefix(buf, bmpHeader)
 }
 
-func vipsLoadFromBuffer(buf []byte) (*C.VipsImage, ImageType, error) {
+func vipsLoadFromBuffer(buf []byte, pages int) (*C.VipsImage, ImageType, error) {
 	src := buf
 	// Reference src here so it's not garbage collected during image initialization.
 	defer runtime.KeepAlive(src)
@@ -181,7 +181,7 @@ func vipsLoadFromBuffer(buf []byte) (*C.VipsImage, ImageType, error) {
 		return nil, ImageTypeUnknown, ErrUnsupportedImageFormat
 	}
 
-	if err := C.load_image_buffer(unsafe.Pointer(&src[0]), C.size_t(len(src)), C.int(imageType), &out); err != 0 {
+	if err := C.load_image_buffer(unsafe.Pointer(&src[0]), C.size_t(len(src)), C.int(imageType), C.int(pages), &out); err != 0 {
 		return nil, ImageTypeUnknown, handleImageError(out)
 	}
 
@@ -273,6 +273,18 @@ func vipsSaveJPEGToBuffer(in *C.VipsImage, quality int, stripMetadata, interlace
 	inter := C.int(boolToInt(interlaced))
 
 	if err := C.save_jpeg_buffer(in, &ptr, &cLen, strip, qual, inter); err != 0 {
+		return nil, handleSaveBufferError(ptr)
+	}
+
+	return toBuff(ptr, cLen), nil
+}
+
+func vipsSaveGIFToBuffer(in *C.VipsImage) ([]byte, error) {
+	incOpCounter("save_gif_buffer")
+	var ptr unsafe.Pointer
+	cLen := C.size_t(0)
+
+	if err := C.save_gif_buffer(in, &ptr, &cLen); err != 0 {
 		return nil, handleSaveBufferError(ptr)
 	}
 
