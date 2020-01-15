@@ -370,6 +370,16 @@ func TestImageRef_Not_Animated(t *testing.T) {
 	assert.Equal(t, 1, image.Pages())
 }
 
+func TestImageRef_Delays_Animated(t *testing.T) {
+	Startup(nil)
+
+	image, err := NewAnimatedImageFromFile(resources+"gif-animated.gif", -1)
+	require.NoError(t, err)
+	defer image.Close()
+
+	assert.Equal(t, []int{100, 100, 100, 100, 100, 100, 100, 100, 100, 100}, image.Delays())
+}
+
 func TestImageRef_Close(t *testing.T) {
 	Startup(nil)
 

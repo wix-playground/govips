@@ -108,7 +108,7 @@ func TestImageRef_RemoveMetadata_Leave_Orientation(t *testing.T) {
 			return img.RemoveMetadata()
 		},
 		func(result *ImageRef) {
-			assert.Equal(t, 5, result.GetOrientation())
+			assert.Equal(t, 5, result.Orientation())
 		}, nil)
 }
 
@@ -128,7 +128,7 @@ func TestImage_AutoRotate_0(t *testing.T) {
 			return img.AutoRotate()
 		},
 		func(result *ImageRef) {
-			assert.Equal(t, 0, result.GetOrientation())
+			assert.Equal(t, 0, result.Orientation())
 		}, nil)
 }
 
@@ -138,7 +138,7 @@ func TestImage_AutoRotate_1(t *testing.T) {
 			return img.AutoRotate()
 		},
 		func(result *ImageRef) {
-			assert.Equal(t, 1, result.GetOrientation())
+			assert.Equal(t, 1, result.Orientation())
 		}, nil)
 }
 
@@ -148,7 +148,7 @@ func TestImage_AutoRotate_5(t *testing.T) {
 			return img.AutoRotate()
 		},
 		func(result *ImageRef) {
-			assert.Equal(t, 1, result.GetOrientation())
+			assert.Equal(t, 1, result.Orientation())
 		}, nil)
 }
 
@@ -158,7 +158,7 @@ func TestImage_AutoRotate_6(t *testing.T) {
 			return img.AutoRotate()
 		},
 		func(result *ImageRef) {
-			assert.Equal(t, 1, result.GetOrientation())
+			assert.Equal(t, 1, result.Orientation())
 		}, nil)
 }
 
@@ -255,6 +255,30 @@ func TestImageRef_Animated_GIF_to_WebP(t *testing.T) {
 		return nil
 	}, nil, &ExportParams{
 		Format: ImageTypeWEBP,
+	})
+}
+
+func TestImageRef_Animated_GIF_Alpha_to_WebP__RetainAlpha(t *testing.T) {
+	goldenTest(t, resources+"gif-animated+alpha.gif", func(img *ImageRef) error {
+		return img.ExtractBand(0, 3)
+	}, nil, &ExportParams{
+		Format: ImageTypeWEBP,
+	})
+}
+
+func TestImageRef_Animated_GIF_Alpha_to_GIF__RetainAlpha(t *testing.T) {
+	goldenTest(t, resources+"gif-animated+alpha.gif", func(img *ImageRef) error {
+		return img.ExtractBand(0, 3)
+	}, nil, &ExportParams{
+		Format: ImageTypeGIF,
+	})
+}
+
+func TestImageRef_Animated_GIF_Alpha_to_JPEG(t *testing.T) {
+	goldenTest(t, resources+"gif-animated+alpha.gif", func(img *ImageRef) error {
+		return img.ExtractBand(0, 3)
+	}, nil, &ExportParams{
+		Format: ImageTypeJPEG,
 	})
 }
 

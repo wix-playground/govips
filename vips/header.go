@@ -35,3 +35,24 @@ func vipsSetMetaOrientation(in *C.VipsImage, orientation int) {
 func vipsGetPagesNumber(in *C.VipsImage) int {
 	return int(C.get_pages_number(in))
 }
+
+func vipsGetPagesDelays(in *C.VipsImage) []int {
+	var out *C.int
+	var outLength C.int
+
+	err := C.get_pages_delays(in, &out, &outLength)
+	if err != 0 {
+		info("failed to get pages delays")
+		return nil
+	}
+
+	//delays := make([]int, int(outLength))
+	//for i, v :=
+
+	//s := fmt.Sprintf("f: %+v", d)
+	//if err != 0 {
+	//	info("failed to get delays")
+	//}
+
+	return nil
+}

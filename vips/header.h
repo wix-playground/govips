@@ -17,3 +17,5 @@ void remove_meta_orientation(VipsImage *in);
 void set_meta_orientation(VipsImage *in, int orientation);
 
 int get_pages_number(VipsImage *in);
+
+int get_pages_delays(VipsImage *in, int **out, int *out_length);

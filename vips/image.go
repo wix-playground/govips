@@ -163,6 +163,11 @@ func (r *ImageRef) Pages() int {
 	return vipsGetPagesNumber(r.image)
 }
 
+// Pages returns the delays between pages
+func (r *ImageRef) Delays() []int {
+	return vipsGetPagesDelays(r.image)
+}
+
 // HasProfile returns if the image has an ICC profile embedded.
 func (r *ImageRef) HasProfile() bool {
 	return vipsHasICCProfile(r.image)

@@ -50,3 +50,13 @@ void set_meta_orientation(VipsImage *in, int orientation) {
 int get_pages_number(VipsImage *in) {
 	return vips_image_get_n_pages(in);
 }
+
+// https://libvips.github.io/libvips/API/current/libvips-header.html#vips-image-get-array-int
+//const char * delay = "delay";
+int get_pages_delays(VipsImage *in, int **out, int *out_length) {
+	if (vips_image_get_typeof(in, "delay") == VIPS_TYPE_ARRAY_INT) {
+		return vips_image_get_array_int(in, "delay", out, out_length);
+	} else {
+		return 0;
+	}
+}
