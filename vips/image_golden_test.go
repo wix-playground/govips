@@ -266,6 +266,22 @@ func TestImageRef_Animated_GIF_to_JPEG__Single_Page(t *testing.T) {
 	})
 }
 
+func TestImageRef_Animated_WebP_to_WebP(t *testing.T) {
+	goldenTest(t, resources+"webp-animated.webp", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeWEBP,
+	})
+}
+
+func TestImageRef_Animated_HEIC_to_WebP(t *testing.T) {
+	goldenTest(t, resources+"heic-animated.heic", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeWEBP,
+	})
+}
+
 func goldenTest(t *testing.T, file string, exec func(img *ImageRef) error, validate func(img *ImageRef), params *ExportParams) []byte {
 	Startup(nil)
 

@@ -469,16 +469,6 @@ func (r *ImageRef) RemoveICCProfile() error {
 	return nil
 }
 
-// deprecated: use optimize
-func (r *ImageRef) TransformICCProfile(isCmyk int) error {
-	out, err := vipsOptimizeICCProfile(r.image, isCmyk)
-	if err != nil {
-		return err
-	}
-	r.setImage(out)
-	return nil
-}
-
 func (r *ImageRef) OptimizeICCProfile() error {
 	isCMYK := 0
 	if r.Interpretation() == InterpretationCMYK {
