@@ -115,10 +115,9 @@ int save_tiff_buffer(VipsImage *in, void **buf, size_t *len) {
 }
 
 // https://libvips.github.io/libvips/API/current/VipsForeignSave.html#vips-magicksave-buffer
-const gchar * gif = "gif";
 int save_gif_buffer(VipsImage *in, void **buf, size_t *len) {
 	return vips_magicksave_buffer(in, buf, len,
-		"format", gif,
+		"format", "gif",
 		NULL
 	);
 }

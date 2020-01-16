@@ -47,6 +47,11 @@ func vipsGetPagesDelays(in *C.VipsImage) []int {
 		return nil
 	}
 
+	if outLength == 0 {
+		return nil
+	}
+
+	// https://github.com/golang/go/wiki/cgo#turning-c-arrays-into-go-slices
 	cdelays := (*[1 << 28]C.int)(unsafe.Pointer(out))[:outLength:outLength]
 
 	delays := make([]int, int(outLength))
@@ -55,4 +60,13 @@ func vipsGetPagesDelays(in *C.VipsImage) []int {
 	}
 
 	return delays
+}
+
+func vipsSetPagesDelays(in *C.VipsImage, delays []int) {
+	cdelays := make([]C.int, len(delays))
+	for i := range delays {
+		cdelays[i] = C.int(delays[i])
+	}
+
+	C.set_pages_delays(in, &cdelays[0], C.int(len(delays)))
 }

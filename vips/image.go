@@ -158,16 +158,6 @@ func (r *ImageRef) Bands() int {
 	return int(r.image.Bands)
 }
 
-// Pages returns the number of pages (frames) for this image
-func (r *ImageRef) Pages() int {
-	return vipsGetPagesNumber(r.image)
-}
-
-// Pages returns the delays between pages
-func (r *ImageRef) Delays() []int {
-	return vipsGetPagesDelays(r.image)
-}
-
 // HasProfile returns if the image has an ICC profile embedded.
 func (r *ImageRef) HasProfile() bool {
 	return vipsHasICCProfile(r.image)
@@ -182,9 +172,32 @@ func (r *ImageRef) HasIPTC() bool {
 	return vipsHasIPTC(r.image)
 }
 
-// HasAlpha returns if the image has an alpha layer.
+// Returns if the image has an alpha layer.
 func (r *ImageRef) HasAlpha() bool {
 	return vipsHasAlpha(r.image)
+}
+
+// Return the number of pages (frames) for this image
+func (r *ImageRef) Pages() int {
+	return vipsGetPagesNumber(r.image)
+}
+
+// Return the delays between pages of animated images, will return nil of not animated
+func (r *ImageRef) Delays() []int {
+	return vipsGetPagesDelays(r.image)
+}
+
+// Return the delays between pages
+func (r *ImageRef) SetDelays(delays []int) error {
+	out, err := vipsCopyImage(r.image)
+	if err != nil {
+		return err
+	}
+
+	vipsSetPagesDelays(out, delays)
+
+	r.setImage(out)
+	return nil
 }
 
 // Return the orientation number as appears in the EXIF, if present

@@ -380,6 +380,42 @@ func TestImageRef_Delays_Animated(t *testing.T) {
 	assert.Equal(t, []int{100, 100, 100, 100, 100, 100, 100, 100, 100, 100}, image.Delays())
 }
 
+func TestImageRef_Delays_Not_Animated(t *testing.T) {
+	Startup(nil)
+
+	image, err := NewImageFromFile(resources + "jpg-24bit.jpg")
+	require.NoError(t, err)
+	defer image.Close()
+
+	assert.Equal(t, []int(nil), image.Delays())
+}
+
+func TestImageRef_SetDelays_Animated(t *testing.T) {
+	Startup(nil)
+
+	image, err := NewAnimatedImageFromFile(resources+"gif-animated.gif", -1)
+	require.NoError(t, err)
+	defer image.Close()
+
+	err = image.SetDelays([]int{300, 200, 100, 100, 100, 100, 100, 100, 100, 0})
+	require.NoError(t, err)
+
+	assert.Equal(t, []int{300, 200, 100, 100, 100, 100, 100, 100, 100, 0}, image.Delays())
+}
+
+func TestImageRef_SetDelays_Not_Animated(t *testing.T) {
+	Startup(nil)
+
+	image, err := NewImageFromFile(resources + "jpg-24bit.jpg")
+	require.NoError(t, err)
+	defer image.Close()
+
+	err = image.SetDelays([]int{300, 200, 100, 100, 100, 100, 100, 100, 100, 0})
+	require.NoError(t, err)
+
+	assert.Equal(t, []int(nil), image.Delays())
+}
+
 func TestImageRef_Close(t *testing.T) {
 	Startup(nil)
 
