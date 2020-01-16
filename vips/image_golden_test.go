@@ -260,7 +260,7 @@ func TestImageRef_Animated_GIF_to_WebP(t *testing.T) {
 
 func TestImageRef_Animated_GIF_Alpha_to_WebP__RetainAlpha(t *testing.T) {
 	goldenTest(t, resources+"gif-animated+alpha.gif", func(img *ImageRef) error {
-		return img.ExtractBand(0, 3)
+		return nil
 	}, nil, &ExportParams{
 		Format: ImageTypeWEBP,
 	})
@@ -268,7 +268,7 @@ func TestImageRef_Animated_GIF_Alpha_to_WebP__RetainAlpha(t *testing.T) {
 
 func TestImageRef_Animated_GIF_Alpha_to_GIF__RetainAlpha(t *testing.T) {
 	goldenTest(t, resources+"gif-animated+alpha.gif", func(img *ImageRef) error {
-		return img.ExtractBand(0, 3)
+		return nil
 	}, nil, &ExportParams{
 		Format: ImageTypeGIF,
 	})
@@ -276,7 +276,7 @@ func TestImageRef_Animated_GIF_Alpha_to_GIF__RetainAlpha(t *testing.T) {
 
 func TestImageRef_Animated_GIF_Alpha_to_JPEG(t *testing.T) {
 	goldenTest(t, resources+"gif-animated+alpha.gif", func(img *ImageRef) error {
-		return img.ExtractBand(0, 3)
+		return nil
 	}, nil, &ExportParams{
 		Format: ImageTypeJPEG,
 	})
