@@ -3,6 +3,7 @@ package vips
 // #cgo pkg-config: vips
 // #include "header.h"
 import "C"
+import "unsafe"
 
 func vipsHasICCProfile(in *C.VipsImage) bool {
 	return int(C.has_icc_profile(in)) != 0
@@ -46,13 +47,12 @@ func vipsGetPagesDelays(in *C.VipsImage) []int {
 		return nil
 	}
 
-	//delays := make([]int, int(outLength))
-	//for i, v :=
+	cdelays := (*[1 << 28]C.int)(unsafe.Pointer(out))[:outLength:outLength]
 
-	//s := fmt.Sprintf("f: %+v", d)
-	//if err != 0 {
-	//	info("failed to get delays")
-	//}
+	delays := make([]int, int(outLength))
+	for i := range cdelays {
+		delays[i] = int(cdelays[i])
+	}
 
-	return nil
+	return delays
 }
