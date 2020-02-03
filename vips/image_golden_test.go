@@ -282,6 +282,22 @@ func TestImageRef_Animated_GIF_2_Alpha_to_GIF__RetainAlpha(t *testing.T) {
 	})
 }
 
+func TestImageRef_Animated_GIF_3_Alpha_to_WebP__RetainAlpha(t *testing.T) {
+	goldenTest(t, resources+"gif-animated+alpha.3.gif", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeWEBP,
+	})
+}
+
+func TestImageRef_Animated_GIF_3_Alpha_to_GIF__RetainAlpha(t *testing.T) {
+	goldenTest(t, resources+"gif-animated+alpha.3.gif", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeGIF,
+	})
+}
+
 func TestImageRef_Animated_GIF_Alpha_to_JPEG(t *testing.T) {
 	goldenTest(t, resources+"gif-animated+alpha.gif", func(img *ImageRef) error {
 		return nil
@@ -306,6 +322,22 @@ func TestImageRef_Animated_WebP_to_WebP(t *testing.T) {
 	})
 }
 
+func TestImageRef_Animated_WebP_to_WebP__RetainAlpha(t *testing.T) {
+	goldenTest(t, resources+"webp-animated+alpha.webp", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeWEBP,
+	})
+}
+
+func TestImageRef_Animated_WebP_to_GIF__RetainAlpha(t *testing.T) {
+	goldenTest(t, resources+"webp-animated+alpha.webp", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeGIF,
+	})
+}
+
 func TestImageRef_Animated_HEIC_to_WebP(t *testing.T) {
 	goldenTest(t, resources+"heic-animated.heic", func(img *ImageRef) error {
 		return nil
@@ -322,7 +354,8 @@ func goldenTest(t *testing.T, file string, exec func(img *ImageRef) error, valid
 	if params != nil && (params.Format == ImageTypeWEBP || params.Format == ImageTypeHEIF || params.Format == ImageTypeGIF) {
 		i, err = NewAnimatedImageFromFile(file, -1)
 	} else {
-		i, err = NewImageFromFile(file)
+		// i, err = NewImageFromFile(file)
+		i, err = NewAnimatedImageFromFile(file, -1)
 	}
 	require.NoError(t, err)
 	defer i.Close()

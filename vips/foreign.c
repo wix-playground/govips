@@ -14,6 +14,7 @@ int load_image_buffer(void *buf, size_t len, int imageType, int pages, VipsImage
 		code = vips_tiffload_buffer(buf, len, out, NULL);
 	} else if (imageType == GIF) {
 		code = vips_gifload_buffer(buf, len, out, "n", pages, NULL);
+//		code = vips_magickload_buffer(buf, len, out, "page", 0, "n", -1, NULL);
 	} else if (imageType == PDF) {
 		code = vips_pdfload_buffer(buf, len, out, NULL);
 	} else if (imageType == SVG) {
@@ -118,6 +119,8 @@ int save_tiff_buffer(VipsImage *in, void **buf, size_t *len) {
 int save_gif_buffer(VipsImage *in, void **buf, size_t *len) {
 	return vips_magicksave_buffer(in, buf, len,
 		"format", "gif",
+		"optimize_gif_frames", TRUE,
+		"optimize_gif_transparency", TRUE,
 		NULL
 	);
 }
