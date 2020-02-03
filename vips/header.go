@@ -3,6 +3,7 @@ package vips
 // #cgo pkg-config: vips
 // #include "header.h"
 import "C"
+import "unsafe"
 
 func vipsHasICCProfile(in *C.VipsImage) bool {
 	return int(C.has_icc_profile(in)) != 0
@@ -12,7 +13,7 @@ func vipsRemoveICCProfile(in *C.VipsImage) bool {
 	return fromGboolean(C.remove_icc_profile(in))
 }
 
-func vipsHasICPTC(in *C.VipsImage) bool {
+func vipsHasIPTC(in *C.VipsImage) bool {
 	return int(C.has_iptc(in)) != 0
 }
 
@@ -30,4 +31,42 @@ func vipsRemoveMetaOrientation(in *C.VipsImage) {
 
 func vipsSetMetaOrientation(in *C.VipsImage, orientation int) {
 	C.set_meta_orientation(in, C.int(orientation))
+}
+
+func vipsGetPagesNumber(in *C.VipsImage) int {
+	return int(C.get_pages_number(in))
+}
+
+func vipsGetPagesDelays(in *C.VipsImage) []int {
+	var out *C.int
+	var outLength C.int
+
+	err := C.get_pages_delays(in, &out, &outLength)
+	if err != 0 {
+		info("failed to get pages delays")
+		return nil
+	}
+
+	if outLength == 0 {
+		return nil
+	}
+
+	// https://github.com/golang/go/wiki/cgo#turning-c-arrays-into-go-slices
+	cdelays := (*[1 << 28]C.int)(unsafe.Pointer(out))[:outLength:outLength]
+
+	delays := make([]int, int(outLength))
+	for i := range cdelays {
+		delays[i] = int(cdelays[i])
+	}
+
+	return delays
+}
+
+func vipsSetPagesDelays(in *C.VipsImage, delays []int) {
+	cdelays := make([]C.int, len(delays))
+	for i := range delays {
+		cdelays[i] = C.int(delays[i])
+	}
+
+	C.set_pages_delays(in, &cdelays[0], C.int(len(delays)))
 }

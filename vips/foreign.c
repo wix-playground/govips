@@ -1,7 +1,7 @@
 #include "lang.h"
 #include "foreign.h"
 
-int load_image_buffer(void *buf, size_t len, int imageType, VipsImage **out) {
+int load_image_buffer(void *buf, size_t len, int imageType, int pages, VipsImage **out) {
 	int code = 1;
 
 	if (imageType == JPEG) {
@@ -9,25 +9,20 @@ int load_image_buffer(void *buf, size_t len, int imageType, VipsImage **out) {
 	} else if (imageType == PNG) {
 		code = vips_pngload_buffer(buf, len, out, NULL);
 	} else if (imageType == WEBP) {
-		code = vips_webpload_buffer(buf, len, out, NULL);
+		code = vips_webpload_buffer(buf, len, out, "n", pages, NULL);
 	} else if (imageType == TIFF) {
 		code = vips_tiffload_buffer(buf, len, out, NULL);
-#if (VIPS_MAJOR_VERSION >= 8)
-#if (VIPS_MINOR_VERSION >= 3)
 	} else if (imageType == GIF) {
-		code = vips_gifload_buffer(buf, len, out, NULL);
+		code = vips_gifload_buffer(buf, len, out, "n", pages, NULL);
+//		code = vips_magickload_buffer(buf, len, out, "page", 0, "n", -1, NULL);
 	} else if (imageType == PDF) {
 		code = vips_pdfload_buffer(buf, len, out, NULL);
 	} else if (imageType == SVG) {
 		code = vips_svgload_buffer(buf, len, out, NULL);
-#endif
-#if (VIPS_MINOR_VERSION >= 8)
 	} else if (imageType == HEIF) {
-		code = vips_heifload_buffer(buf, len, out, NULL);
-#endif
+		code = vips_heifload_buffer(buf, len, out, "n", pages, NULL);
 	} else if (imageType == MAGICK) {
 		code = vips_magickload_buffer(buf, len, out, NULL);
-#endif
 	}
 
 	return code;
@@ -118,4 +113,14 @@ int save_heif_buffer(VipsImage *in, void **buf, size_t *len, int quality, int lo
 // https://libvips.github.io/libvips/API/current/VipsForeignSave.html#vips-tiffsave-buffer
 int save_tiff_buffer(VipsImage *in, void **buf, size_t *len) {
 	return vips_tiffsave_buffer(in, buf, len, NULL);
+}
+
+// https://libvips.github.io/libvips/API/current/VipsForeignSave.html#vips-magicksave-buffer
+int save_gif_buffer(VipsImage *in, void **buf, size_t *len) {
+	return vips_magicksave_buffer(in, buf, len,
+		"format", "gif",
+		"optimize_gif_frames", TRUE,
+		"optimize_gif_transparency", TRUE,
+		NULL
+	);
 }

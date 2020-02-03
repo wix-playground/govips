@@ -108,7 +108,7 @@ func TestImageRef_RemoveMetadata_Leave_Orientation(t *testing.T) {
 			return img.RemoveMetadata()
 		},
 		func(result *ImageRef) {
-			assert.Equal(t, 5, result.GetOrientation())
+			assert.Equal(t, 5, result.Orientation())
 		}, nil)
 }
 
@@ -128,7 +128,7 @@ func TestImage_AutoRotate_0(t *testing.T) {
 			return img.AutoRotate()
 		},
 		func(result *ImageRef) {
-			assert.Equal(t, 0, result.GetOrientation())
+			assert.Equal(t, 0, result.Orientation())
 		}, nil)
 }
 
@@ -138,7 +138,7 @@ func TestImage_AutoRotate_1(t *testing.T) {
 			return img.AutoRotate()
 		},
 		func(result *ImageRef) {
-			assert.Equal(t, 1, result.GetOrientation())
+			assert.Equal(t, 1, result.Orientation())
 		}, nil)
 }
 
@@ -148,7 +148,7 @@ func TestImage_AutoRotate_5(t *testing.T) {
 			return img.AutoRotate()
 		},
 		func(result *ImageRef) {
-			assert.Equal(t, 1, result.GetOrientation())
+			assert.Equal(t, 1, result.Orientation())
 		}, nil)
 }
 
@@ -158,7 +158,7 @@ func TestImage_AutoRotate_6(t *testing.T) {
 			return img.AutoRotate()
 		},
 		func(result *ImageRef) {
-			assert.Equal(t, 1, result.GetOrientation())
+			assert.Equal(t, 1, result.Orientation())
 		}, nil)
 }
 
@@ -242,10 +242,121 @@ func TestImageRef_Linear_Alpha(t *testing.T) {
 	}, nil, nil)
 }
 
+func TestImageRef_Animated_GIF_to_GIF(t *testing.T) {
+	goldenTest(t, resources+"gif-animated.gif", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeGIF,
+	})
+}
+
+func TestImageRef_Animated_GIF_to_WebP(t *testing.T) {
+	goldenTest(t, resources+"gif-animated.gif", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeWEBP,
+	})
+}
+
+func TestImageRef_Animated_GIF_Alpha_to_WebP__RetainAlpha(t *testing.T) {
+	goldenTest(t, resources+"gif-animated+alpha.gif", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeWEBP,
+	})
+}
+
+func TestImageRef_Animated_GIF_Alpha_to_GIF__RetainAlpha(t *testing.T) {
+	goldenTest(t, resources+"gif-animated+alpha.gif", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeGIF,
+	})
+}
+
+func TestImageRef_Animated_GIF_2_Alpha_to_GIF__RetainAlpha(t *testing.T) {
+	goldenTest(t, resources+"gif-animated+alpha.2.gif", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeGIF,
+	})
+}
+
+func TestImageRef_Animated_GIF_3_Alpha_to_WebP__RetainAlpha(t *testing.T) {
+	goldenTest(t, resources+"gif-animated+alpha.3.gif", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeWEBP,
+	})
+}
+
+func TestImageRef_Animated_GIF_3_Alpha_to_GIF__RetainAlpha(t *testing.T) {
+	goldenTest(t, resources+"gif-animated+alpha.3.gif", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeGIF,
+	})
+}
+
+func TestImageRef_Animated_GIF_Alpha_to_JPEG(t *testing.T) {
+	goldenTest(t, resources+"gif-animated+alpha.gif", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeJPEG,
+	})
+}
+
+func TestImageRef_Animated_GIF_to_JPEG__Single_Page(t *testing.T) {
+	goldenTest(t, resources+"gif-animated.gif", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeJPEG,
+	})
+}
+
+func TestImageRef_Animated_WebP_to_WebP(t *testing.T) {
+	goldenTest(t, resources+"webp-animated.webp", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeWEBP,
+	})
+}
+
+func TestImageRef_Animated_WebP_to_WebP__RetainAlpha(t *testing.T) {
+	goldenTest(t, resources+"webp-animated+alpha.webp", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeWEBP,
+	})
+}
+
+func TestImageRef_Animated_WebP_to_GIF__RetainAlpha(t *testing.T) {
+	goldenTest(t, resources+"webp-animated+alpha.webp", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeGIF,
+	})
+}
+
+func TestImageRef_Animated_HEIC_to_WebP(t *testing.T) {
+	goldenTest(t, resources+"heic-animated.heic", func(img *ImageRef) error {
+		return nil
+	}, nil, &ExportParams{
+		Format: ImageTypeWEBP,
+	})
+}
+
 func goldenTest(t *testing.T, file string, exec func(img *ImageRef) error, validate func(img *ImageRef), params *ExportParams) []byte {
 	Startup(nil)
 
-	i, err := NewImageFromFile(file)
+	var i *ImageRef
+	var err error
+	if params != nil && (params.Format == ImageTypeWEBP || params.Format == ImageTypeHEIF || params.Format == ImageTypeGIF) {
+		i, err = NewAnimatedImageFromFile(file, -1)
+	} else {
+		// i, err = NewImageFromFile(file)
+		i, err = NewAnimatedImageFromFile(file, -1)
+	}
 	require.NoError(t, err)
 	defer i.Close()
 
@@ -255,6 +366,11 @@ func goldenTest(t *testing.T, file string, exec func(img *ImageRef) error, valid
 	buf, _, err := i.Export(params)
 	require.NoError(t, err)
 
+	ext := ""
+	if params != nil && params.Format != ImageTypeUnknown {
+		ext = imageTypeExtensionMap[params.Format]
+	}
+
 	if validate != nil {
 		result, err := NewImageFromBuffer(buf)
 		require.NoError(t, err)
@@ -263,12 +379,12 @@ func goldenTest(t *testing.T, file string, exec func(img *ImageRef) error, valid
 		validate(result)
 	}
 
-	assertGoldenMatch(t, file, buf)
+	assertGoldenMatch(t, file, buf, ext)
 
 	return buf
 }
 
-func assertGoldenMatch(t *testing.T, file string, buf []byte) {
+func assertGoldenMatch(t *testing.T, file string, buf []byte, ext string) {
 	i := strings.LastIndex(file, ".")
 	if i < 0 {
 		panic("bad filename")
@@ -277,7 +393,9 @@ func assertGoldenMatch(t *testing.T, file string, buf []byte) {
 	name := strings.Replace(t.Name(), "/", "_", -1)
 	name = strings.Replace(name, "TestImage_", "", -1)
 	prefix := file[:i] + "." + name
-	ext := file[i:]
+	if ext == "" {
+		ext = file[i:]
+	}
 	goldenFile := prefix + ".golden" + ext
 
 	golden, _ := ioutil.ReadFile(goldenFile)

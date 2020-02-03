@@ -45,3 +45,24 @@ void remove_meta_orientation(VipsImage *in) {
 void set_meta_orientation(VipsImage *in, int orientation) {
 	vips_image_set_int(in, VIPS_META_ORIENTATION, orientation);
 }
+
+// https://libvips.github.io/libvips/API/current/libvips-header.html#vips-image-get-n-pages
+int get_pages_number(VipsImage *in) {
+	return vips_image_get_n_pages(in);
+}
+
+// https://libvips.github.io/libvips/API/current/libvips-header.html#vips-image-get-array-int
+int get_pages_delays(VipsImage *in, int **out, int *out_length) {
+	if (vips_image_get_typeof(in, "delay") == VIPS_TYPE_ARRAY_INT) {
+		return vips_image_get_array_int(in, "delay", out, out_length);
+	} else {
+		return 0;
+	}
+}
+
+// https://libvips.github.io/libvips/API/current/libvips-header.html#vips-image-set-array-int
+void set_pages_delays(VipsImage *in, int *delays, int delays_length) {
+	if (vips_image_get_typeof(in, "delay") == VIPS_TYPE_ARRAY_INT) {
+		vips_image_set_array_int(in, "delay", delays, delays_length);
+	}
+}

@@ -11,9 +11,9 @@ The intent for this is to enable developers to build extremely fast image proces
 Libvips is generally 4-8x faster than other graphics processors such as GraphicsMagick and ImageMagick.
 
 ## Requirements
-- [libvips](https://github.com/libvips/libvips) 8+ (8.8.1+ recommended for GIF, PDF, SVG, HEIC support)
+- [libvips](https://github.com/libvips/libvips) 8.9+
 - C compatible compiler such as gcc 4.6+ or clang 3.0+
-- Go 1.11+
+- Go 1.13+
 
 ## Installation
 ```bash
@@ -27,12 +27,6 @@ if err != nil {
 	return nil, err
 }
 defer image.Close()
-
-// Resize an image with padding
-return vips.Transform().
-	PadStrategy(vips.ExtendBlack).
-	Resize(1200, 1200).
-	ApplyAndExport(image)
 ```
 
 ## Contributing
