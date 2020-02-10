@@ -65,7 +65,11 @@ func Startup(config *Config) {
 	}
 
 	if C.VIPS_MAJOR_VERSION < 8 {
-		panic("Requires libvips version 8+")
+		panic("Requires libvips version 8.9+")
+	}
+
+	if C.VIPS_MAJOR_VERSION == 8 && C.VIPS_MINOR_VERSION < 9 {
+		panic("Requires libvips version 8.9+")
 	}
 
 	cName := C.CString("govips")

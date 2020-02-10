@@ -12,22 +12,16 @@ int load_image_buffer(void *buf, size_t len, int imageType, VipsImage **out) {
 		code = vips_webpload_buffer(buf, len, out, NULL);
 	} else if (imageType == TIFF) {
 		code = vips_tiffload_buffer(buf, len, out, NULL);
-#if (VIPS_MAJOR_VERSION >= 8)
-#if (VIPS_MINOR_VERSION >= 3)
 	} else if (imageType == GIF) {
 		code = vips_gifload_buffer(buf, len, out, NULL);
 	} else if (imageType == PDF) {
 		code = vips_pdfload_buffer(buf, len, out, NULL);
 	} else if (imageType == SVG) {
 		code = vips_svgload_buffer(buf, len, out, NULL);
-#endif
-#if (VIPS_MINOR_VERSION >= 8)
 	} else if (imageType == HEIF) {
 		code = vips_heifload_buffer(buf, len, out, NULL);
-#endif
 	} else if (imageType == MAGICK) {
 		code = vips_magickload_buffer(buf, len, out, NULL);
-#endif
 	}
 
 	return code;
