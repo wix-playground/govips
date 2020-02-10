@@ -17,43 +17,46 @@ type ImageType int
 
 // ImageType enum
 const (
-	ImageTypeUnknown ImageType = C.UNKNOWN
-	ImageTypeGIF     ImageType = C.GIF
-	ImageTypeJPEG    ImageType = C.JPEG
-	ImageTypeMagick  ImageType = C.MAGICK
-	ImageTypePDF     ImageType = C.PDF
-	ImageTypePNG     ImageType = C.PNG
-	ImageTypeSVG     ImageType = C.SVG
-	ImageTypeTIFF    ImageType = C.TIFF
-	ImageTypeWEBP    ImageType = C.WEBP
-	ImageTypeHEIF    ImageType = C.HEIF
-	ImageTypeBMP     ImageType = C.BMP
+	ImageTypeUnknown  ImageType = C.UNKNOWN
+	ImageTypeGIF      ImageType = C.GIF
+	ImageTypeJPEG     ImageType = C.JPEG
+	ImageTypeMagick   ImageType = C.MAGICK
+	ImageTypePDF      ImageType = C.PDF
+	ImageTypePNG      ImageType = C.PNG
+	ImageTypeSVG      ImageType = C.SVG
+	ImageTypeTIFF     ImageType = C.TIFF
+	ImageTypeWEBP     ImageType = C.WEBP
+	ImageTypeHEIF     ImageType = C.HEIF
+	ImageTypeBMP      ImageType = C.BMP
+	ImageTypeJPEG2000 ImageType = C.JPEG2000
 )
 
 var imageTypeExtensionMap = map[ImageType]string{
-	ImageTypeGIF:    ".gif",
-	ImageTypeJPEG:   ".jpeg",
-	ImageTypeMagick: ".magick",
-	ImageTypePDF:    ".pdf",
-	ImageTypePNG:    ".png",
-	ImageTypeSVG:    ".svg",
-	ImageTypeTIFF:   ".tiff",
-	ImageTypeWEBP:   ".webp",
-	ImageTypeHEIF:   ".heic",
-	ImageTypeBMP:    ".bmp",
+	ImageTypeGIF:      ".gif",
+	ImageTypeJPEG:     ".jpeg",
+	ImageTypeMagick:   ".magick",
+	ImageTypePDF:      ".pdf",
+	ImageTypePNG:      ".png",
+	ImageTypeSVG:      ".svg",
+	ImageTypeTIFF:     ".tiff",
+	ImageTypeWEBP:     ".webp",
+	ImageTypeHEIF:     ".heic",
+	ImageTypeBMP:      ".bmp",
+	ImageTypeJPEG2000: ".jp2",
 }
 
 var ImageTypes = map[ImageType]string{
-	ImageTypeGIF:    "gif",
-	ImageTypeJPEG:   "jpeg",
-	ImageTypeMagick: "magick",
-	ImageTypePDF:    "pdf",
-	ImageTypePNG:    "png",
-	ImageTypeSVG:    "svg",
-	ImageTypeTIFF:   "tiff",
-	ImageTypeWEBP:   "webp",
-	ImageTypeHEIF:   "heif",
-	ImageTypeBMP:    "bmp",
+	ImageTypeGIF:      "gif",
+	ImageTypeJPEG:     "jpeg",
+	ImageTypeMagick:   "magick",
+	ImageTypePDF:      "pdf",
+	ImageTypePNG:      "png",
+	ImageTypeSVG:      "svg",
+	ImageTypeTIFF:     "tiff",
+	ImageTypeWEBP:     "webp",
+	ImageTypeHEIF:     "heif",
+	ImageTypeBMP:      "bmp",
+	ImageTypeJPEG2000: "jpeg2000",
 }
 
 // FileExt returns the canonical extension for the ImageType

@@ -33,46 +33,6 @@ int load_image_buffer(void *buf, size_t len, int imageType, VipsImage **out) {
 	return code;
 }
 
-int find_image_loader(int t) {
-  switch (t) {
-    case GIF:
-      return vips_type_find("VipsOperation", "gifload");
-    case PDF:
-      return vips_type_find("VipsOperation", "pdfload");
-    case TIFF:
-      return vips_type_find("VipsOperation", "tiffload");
-    case SVG:
-      return vips_type_find("VipsOperation", "svgload");
-    case WEBP:
-      return vips_type_find("VipsOperation", "webpload");
-    case PNG:
-      return vips_type_find("VipsOperation", "pngload");
-    case JPEG:
-      return vips_type_find("VipsOperation", "jpegload");
-    case HEIF:
-      return vips_type_find("VipsOperation", "heifload");
-    case MAGICK:
-      return vips_type_find("VipsOperation", "magickload");
-  }
-	return 0;
-}
-
-int find_image_type_saver(int t) {
-  switch (t) {
-    case TIFF:
-      return vips_type_find("VipsOperation", "tiffsave_buffer");
-    case WEBP:
-      return vips_type_find("VipsOperation", "webpsave_buffer");
-    case PNG:
-      return vips_type_find("VipsOperation", "pngsave_buffer");
-    case JPEG:
-      return vips_type_find("VipsOperation", "jpegsave_buffer");
-    case HEIF:
-      return vips_type_find("VipsOperation", "heifsave_buffer");
-  }
-	return 0;
-}
-
 int save_jpeg_buffer(VipsImage *in, void **buf, size_t *len, int strip, int quality, int interlace) {
     return vips_jpegsave_buffer(in, buf, len,
 		"strip", INT_TO_GBOOLEAN(strip),
