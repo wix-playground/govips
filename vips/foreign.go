@@ -95,15 +95,25 @@ func DetermineImageType(buf []byte) ImageType {
 		return ImageTypePDF
 	} else if isBMP(buf) {
 		return ImageTypeBMP
+	} else if isJPEG2000(buf) {
+		return ImageTypeJPEG2000
 	} else {
 		return ImageTypeUnknown
 	}
 }
 
+var ftyp = []byte("ftyp")
+
 var jpeg = []byte("\xFF\xD8\xFF")
 
 func isJPEG(buf []byte) bool {
 	return bytes.HasPrefix(buf, jpeg)
+}
+
+var jpeg2000 = []byte("jp2")
+
+func isJPEG2000(buf []byte) bool {
+	return bytes.Equal(buf[16:20], ftyp) && bytes.Equal(buf[20:23], jpeg2000)
 }
 
 var gifHeader = []byte("\x47\x49\x46")
@@ -132,7 +142,6 @@ func isWEBP(buf []byte) bool {
 }
 
 // https://github.com/strukturag/libheif/blob/master/libheif/heif.cc
-var ftyp = []byte("ftyp")
 var heic = []byte("heic")
 var mif1 = []byte("mif1")
 

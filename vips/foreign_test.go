@@ -104,3 +104,14 @@ func Test_DetermineImageType__BMP(t *testing.T) {
 	imageType := DetermineImageType(buf)
 	assert.Equal(t, ImageTypeBMP, imageType)
 }
+
+func Test_DetermineImageType__JPEG2000(t *testing.T) {
+	Startup(&Config{})
+
+	buf, err := ioutil.ReadFile(resources + "jpg2000-lossless-24bit-icc-adobe-rgb.jp2")
+	assert.NoError(t, err)
+	assert.NotNil(t, buf)
+
+	imageType := DetermineImageType(buf)
+	assert.Equal(t, ImageTypeJPEG2000, imageType)
+}
