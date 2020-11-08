@@ -237,22 +237,21 @@ func vipsSavePNGToBuffer(in *C.VipsImage, stripMetadata bool, compression int, i
 	return toBuff(ptr, cLen), nil
 }
 
-func vipsSaveWebPToBuffer(in *C.VipsImage, stripMetadata bool, quality int, lossless bool, effort int, profile string) ([]byte, error) {
+func vipsSaveWebPToBuffer(in *C.VipsImage, stripMetadata bool, quality int, lossless bool, nearLossless bool,
+	effort int, profile string) ([]byte, error) {
 	incOpCounter("save_webp_buffer")
 	var ptr unsafe.Pointer
 	var cProfile *C.char
 	var cLen C.size_t
 
-	strip := C.int(boolToInt(stripMetadata))
-	qual := C.int(quality)
-	loss := C.int(boolToInt(lossless))
-	eff := C.int(effort)
 	if profile != "" {
 		cProfile = C.CString(profile)
 		defer C.free(unsafe.Pointer(cProfile))
 	}
 
-	if err := C.save_webp_buffer(in, &ptr, &cLen, strip, qual, loss, eff, cProfile); err != 0 {
+	if err := C.save_webp_buffer(
+		in, &ptr, &cLen, C.int(boolToInt(stripMetadata)), C.int(quality), C.int(boolToInt(lossless)),
+		C.int(boolToInt(nearLossless)), C.int(effort), cProfile); err != 0 {
 		return nil, handleSaveBufferError(ptr)
 	}
 

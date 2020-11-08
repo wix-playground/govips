@@ -42,12 +42,13 @@ type ImageMetadata struct {
 
 // ExportParams are options when exporting an image to file or buffer
 type ExportParams struct {
-	Format      ImageType
-	Quality     int
-	Compression int
-	Interlaced  bool
-	Lossless    bool
-	Effort      int
+	Format       ImageType
+	Quality      int
+	Compression  int
+	Interlaced   bool
+	Lossless     bool
+	NearLossless bool
+	Effort       int
 }
 
 func NewDefaultExportParams() *ExportParams {
@@ -79,10 +80,11 @@ func NewDefaultPNGExportParams() *ExportParams {
 
 func NewDefaultWEBPExportParams() *ExportParams {
 	return &ExportParams{
-		Format:   ImageTypeWEBP,
-		Quality:  75,
-		Lossless: false,
-		Effort:   4,
+		Format:       ImageTypeWEBP,
+		Quality:      75,
+		Lossless:     false,
+		NearLossless: false,
+		Effort:       4,
 	}
 }
 
@@ -752,8 +754,8 @@ func (r *ImageRef) exportBuffer(params *ExportParams) ([]byte, ImageType, error)
 
 	switch format {
 	case ImageTypeWEBP:
-		buf, err = vipsSaveWebPToBuffer(r.image, false, params.Quality, params.Lossless, params.Effort,
-			r.optimizedIccProfile)
+		buf, err = vipsSaveWebPToBuffer(r.image, false, params.Quality, params.Lossless, params.NearLossless,
+			params.Effort, r.optimizedIccProfile)
 	case ImageTypePNG:
 		buf, err = vipsSavePNGToBuffer(r.image, false, params.Compression, params.Interlaced)
 	case ImageTypeTIFF:

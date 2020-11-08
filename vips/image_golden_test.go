@@ -124,9 +124,10 @@ func TestImageRef_Orientation_Issue(t *testing.T) {
 		NewDefaultWEBPExportParams())
 }
 
-func TestImageRef_PngToWebp_OptimizeICCProfile_HasProfile(t *testing.T) {
+func TestImageRef_PngToWebp_OptimizeICCProfile_NearLossless_HasProfile(t *testing.T) {
 	exportParams := NewDefaultWEBPExportParams()
 	exportParams.Quality = 90
+	exportParams.NearLossless = true
 
 	goldenTest(t, resources+"has-icc-profile.png",
 		func(img *ImageRef) error {
@@ -330,8 +331,10 @@ func assertGoldenMatch(t *testing.T, file string, buf []byte, format ImageType) 
 
 	golden, _ := ioutil.ReadFile(goldenFile)
 	if golden != nil {
-		if !assert.Equal(t, golden, buf, "output not equal to golden\nExpected %v\nBut got %v",
-			path.Base(goldenFile), path.Base(file)) {
+		if !assert.Equal(t, golden, buf,
+			"output not equal to golden\nExpected %v (%v bytes)\nBut got %v (%v bytes)",
+			path.Base(goldenFile), len(golden),
+			path.Base(file), len(buf)) {
 			failed := prefix + ".failed" + ext
 			err := ioutil.WriteFile(failed, buf, 0666)
 			if err != nil {
