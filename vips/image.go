@@ -50,6 +50,7 @@ type ExportParams struct {
 	Compression   int
 	Interlaced    bool
 	Lossless      bool
+	NearLossless  bool
 	Effort        int
 	StripMetadata bool
 }
@@ -93,10 +94,11 @@ func NewDefaultPNGExportParams() *ExportParams {
 // By default, govips creates lossy images with a quality of 75/100.
 func NewDefaultWEBPExportParams() *ExportParams {
 	return &ExportParams{
-		Format:   ImageTypeWEBP,
-		Quality:  75,
-		Lossless: false,
-		Effort:   4,
+		Format:       ImageTypeWEBP,
+		Quality:      75,
+		Lossless:     false,
+		NearLossless: false,
+		Effort:       4,
 	}
 }
 
@@ -321,7 +323,6 @@ func (r *ImageRef) Export(params *ExportParams) ([]byte, *ImageMetadata, error) 
 	return buf, metadata, nil
 }
 
-// Composite composites the given overlay image on top of the associated image with provided blending mode.
 func (r *ImageRef) resolveExportParams(params *ExportParams) *ExportParams {
 	if params == nil {
 		switch r.format {
@@ -343,6 +344,7 @@ func (r *ImageRef) resolveExportParams(params *ExportParams) *ExportParams {
 	return params
 }
 
+// Composite composites the given overlay image on top of the associated image with provided blending mode.
 func (r *ImageRef) Composite(overlay *ImageRef, mode BlendMode, x, y int) error {
 	out, err := vipsComposite2(r.image, overlay.image, mode, x, y)
 	if err != nil {
@@ -809,8 +811,8 @@ func (r *ImageRef) exportBuffer(params *ExportParams) ([]byte, ImageType, error)
 
 	switch format {
 	case ImageTypeWEBP:
-		buf, err = vipsSaveWebPToBuffer(r.image, false, params.Quality, params.Lossless, params.Effort,
-			r.optimizedIccProfile)
+		buf, err = vipsSaveWebPToBuffer(r.image, false, params.Quality, params.Lossless, params.NearLossless,
+			params.Effort, r.optimizedIccProfile)
 	case ImageTypePNG:
 		buf, err = vipsSavePNGToBuffer(r.image, params.StripMetadata, params.Compression, params.Interlaced)
 	case ImageTypeTIFF:
