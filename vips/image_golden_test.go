@@ -2,7 +2,8 @@ package vips
 
 import (
 	"io/ioutil"
-	"path"
+	"os/exec"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -297,26 +298,41 @@ func goldenTest(t *testing.T, file string, exec func(img *ImageRef) error, valid
 
 	i, err := NewImageFromFile(file)
 	require.NoError(t, err)
-	defer i.Close()
 
 	err = exec(i)
 	require.NoError(t, err)
 
-	buf, _, err := i.Export(params)
+	buf, metadata, err := i.Export(params)
 	require.NoError(t, err)
 
 	if validate != nil {
 		result, err := NewImageFromBuffer(buf)
 		require.NoError(t, err)
-		defer result.Close()
 
 		validate(result)
 	}
 
-	// It's unrealistic to expect different environments to produce identical images to the bit
-	// assertGoldenMatch(t, file, buf, metadata.Format)
+	assertGoldenMatch(t, file, buf, metadata.Format)
 
 	return buf
+}
+
+func getEnvironment() string {
+	switch runtime.GOOS {
+	case "windows":
+		return "windows"
+	case "darwin":
+		return "macos"
+	case "linux":
+		out, err := exec.Command("lsb_release", "-cs").Output()
+		if err != nil {
+			return "linux"
+		}
+		strout := strings.TrimSuffix(string(out), "\n")
+		return "linux-" + strout
+	}
+	// default to linux assets otherwise
+	return "linux"
 }
 
 func assertGoldenMatch(t *testing.T, file string, buf []byte, format ImageType) {
@@ -329,15 +345,12 @@ func assertGoldenMatch(t *testing.T, file string, buf []byte, format ImageType) 
 	name = strings.Replace(name, "TestImage_", "", -1)
 	prefix := file[:i] + "." + name
 	ext := format.FileExt()
-	goldenFile := prefix + ".golden" + ext
+	goldenFile := prefix + "-" + getEnvironment() + ".golden" + ext
 
 	golden, _ := ioutil.ReadFile(goldenFile)
 	if golden != nil {
-		if !assert.Equal(t, golden, buf,
-			"output not equal to golden\nExpected %v (%v bytes)\nBut got %v (%v bytes)",
-			path.Base(goldenFile), len(golden),
-			path.Base(file), len(buf)) {
-			failed := prefix + ".failed" + ext
+		if !assert.Equal(t, golden, buf) {
+			failed := prefix + "-" + getEnvironment() + ".failed" + ext
 			err := ioutil.WriteFile(failed, buf, 0666)
 			if err != nil {
 				panic(err)

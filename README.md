@@ -1,4 +1,4 @@
-# govips [![GoDoc](https://godoc.org/github.com/davidbyttow/govips?status.svg)](https://pkg.go.dev/mod/github.com/davidbyttow/govips/v2) [![Go Report Card](http://goreportcard.com/badge/davidbyttow/govips)](http://goreportcard.com/report/davidbyttow/govips) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/davidbyttow/govips) ![License](https://img.shields.io/badge/license-MIT-blue.svg) [![Build Status](https://travis-ci.org/davidbyttow/govips.svg?branch=master)](https://travis-ci.org/davidbyttow/govips) [![Coverage Status](https://img.shields.io/coveralls/github/davidbyttow/govips)](https://coveralls.io/github/davidbyttow/govips?branch=master)
+# govips [![GoDoc](https://godoc.org/github.com/davidbyttow/govips?status.svg)](https://pkg.go.dev/mod/github.com/davidbyttow/govips/v2) [![Go Report Card](http://goreportcard.com/badge/davidbyttow/govips)](http://goreportcard.com/report/davidbyttow/govips) ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/davidbyttow/govips) ![License](https://img.shields.io/badge/license-MIT-blue.svg) [![Build Status](https://github.com/davidbyttow/govips/workflows/build/badge.svg)](https://github.com/davidbyttow/govips/actions) [![Coverage Status](https://img.shields.io/coveralls/github/davidbyttow/govips)](https://coveralls.io/github/davidbyttow/govips?branch=master)
 
 ## A lightning fast image processing and resizing library for Go
 
@@ -74,10 +74,10 @@ func checkError(err error) {
 
 func main() {
 	vips.Startup(nil)
+	defer vips.Shutdown()
 
 	image1, err := vips.NewImageFromFile("input.jpg")
 	checkError(err)
-	defer image1.Close()
 
 	// Rotate the picture upright and reset EXIF orientation tag
 	err = image1.AutoRotate()
@@ -88,7 +88,6 @@ func main() {
 	err = ioutil.WriteFile("output.jpg", image1bytes, 0644)
 	checkError(err)
 
-	vips.Shutdown()
 }
 ```
 
