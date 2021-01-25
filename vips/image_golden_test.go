@@ -2,11 +2,13 @@ package vips
 
 import (
 	"bytes"
+	"fmt"
 	"image"
 	jpeg2 "image/jpeg"
 	"image/png"
 	"io/ioutil"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
@@ -127,7 +129,8 @@ func TestImageRef_RemoveMetadata_Leave_Orientation(t *testing.T) {
 		}, nil)
 }
 
-func TestImageRef_Orientation_Issue(t *testing.T) {
+//This test is disabled until this issue is resolved: https://github.com/libvips/libvips/pull/1745
+func _TestImageRef_Orientation_Issue(t *testing.T) {
 	goldenTest(t, resources+"orientation-issue-1.jpg",
 		func(img *ImageRef) error {
 			return img.Resize(0.9, KernelLanczos3)
@@ -211,25 +214,25 @@ func TestImage_AutoRotate_6__heic_to_jpg(t *testing.T) {
 		}, NewDefaultJPEGExportParams())
 }
 
-func TestImage_Sharpen_24bit_Alpha(t *testing.T) {
+func TestImage_Sharpen_Luminescence_24bit_Alpha(t *testing.T) {
 	goldenTest(t, resources+"png-24bit+alpha.png", func(img *ImageRef) error {
 		//usm_0.66_1.00_0.01
 		sigma := 1 + (0.66 / 2)
 		x1 := 0.01 * 100
 		m2 := 1.0
 
-		return img.Sharpen(sigma, x1, m2)
+		return img.Sharpen(sigma, x1, m2, SharpenModeLuminescence)
 	}, nil, nil)
 }
 
-func TestImage_Sharpen_8bit_Alpha(t *testing.T) {
+func TestImage_Sharpen_RGB_24bit_Alpha(t *testing.T) {
 	goldenTest(t, resources+"png-8bit+alpha.png", func(img *ImageRef) error {
 		//usm_0.66_1.00_0.01
 		sigma := 1 + (0.66 / 2)
 		x1 := 0.01 * 100
 		m2 := 1.0
 
-		return img.Sharpen(sigma, x1, m2)
+		return img.Sharpen(sigma, x1, m2, SharpenModeRGB)
 	}, nil, nil)
 }
 
@@ -589,25 +592,32 @@ func getEnvironment() string {
 	// default to linux assets otherwise
 	return "linux"
 }
+func assertGoldenMatch(t *testing.T, imagePath string, imageData []byte, format ImageType) {
+	imagePath, err := filepath.Abs(imagePath)
+	panicOnError(err)
 
-func assertGoldenMatch(t *testing.T, file string, buf []byte, format ImageType) {
-	i := strings.LastIndex(file, ".")
-	if i < 0 {
+	dotIndex := strings.LastIndex(imagePath, ".")
+	if dotIndex < 0 {
 		panic("bad filename")
 	}
 
-	name := strings.Replace(t.Name(), "/", "_", -1)
-	name = strings.Replace(name, "TestImage_", "", -1)
-	prefix := file[:i] + "." + name
+	testName := strings.Replace(t.Name(), "/", "_", -1)
+	testName = strings.Replace(testName, "TestImage_", "", -1)
+	prefix := imagePath[:dotIndex] + "." + testName
 	ext := format.FileExt()
-	goldenFile := prefix + "-" + getEnvironment() + ".golden" + ext
+	goldenPath, err := filepath.Abs(prefix + ".golden" + ext)
+	panicOnError(err)
 
-	golden, _ := ioutil.ReadFile(goldenFile)
-	if golden != nil {
-		sameAsGolden := assert.True(t, bytes.Equal(buf, golden), "Actual image (size=%d) didn't match expected golden file=%s (size=%d)", len(buf), goldenFile, len(golden))
-		if !sameAsGolden {
-			failed := prefix + "-" + getEnvironment() + ".failed" + ext
-			err := ioutil.WriteFile(failed, buf, 0666)
+	expectedData, _ := ioutil.ReadFile(goldenPath)
+	if expectedData != nil {
+		if !bytes.Equal(expectedData, imageData) {
+			failedPath := prefix + ".failed" + ext
+			assert.Fail(t, "Output not equal to golden result",
+				"expected\t%v (%v bytes)\n"+
+					"but got\t\t%v (%v bytes)",
+				goldenPath, len(expectedData), failedPath, len(imageData))
+			fmt.Printf("To diff and prompt to replace golden file: ./diff-replace-golden.sh %v %v\n", goldenPath, failedPath)
+			err := ioutil.WriteFile(failedPath, imageData, 0666)
 			if err != nil {
 				panic(err)
 			}
@@ -615,7 +625,13 @@ func assertGoldenMatch(t *testing.T, file string, buf []byte, format ImageType) 
 		return
 	}
 
-	t.Log("writing golden file: " + goldenFile)
-	err := ioutil.WriteFile(goldenFile, buf, 0644)
-	assert.NoError(t, err)
+	t.Log("writing golden file: " + goldenPath)
+	err = ioutil.WriteFile(goldenPath, imageData, 0644)
+	panicOnError(err)
+}
+
+func panicOnError(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
