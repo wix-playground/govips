@@ -829,16 +829,16 @@ func (r *ImageRef) OptimizeICCProfile() error {
 		return nil
 	}
 
-	r.optimizedIccProfile = C.GoString(C.SRGB_V2_MICRO_ICC_PATH)
+	r.optimizedIccProfile = SRGBV2MicroICCProfilePath
 	if r.Bands() <= 2 {
-		r.optimizedIccProfile = C.GoString(C.SGRAY_V2_MICRO_ICC_PATH)
+		r.optimizedIccProfile = SGrayV2MicroICCProfilePath
 	}
 
 	embedded := r.HasICCProfile() && (inputProfile == "")
 
 	out, err := vipsICCTransform(r.image, r.optimizedIccProfile, inputProfile, IntentPerceptual, 0, embedded)
 	if err != nil {
-		info(err.Error())
+		govipsLog("govips", LogLevelInfo, fmt.Sprintf("failed to do icc transform: %v", err.Error()))
 		return err
 	}
 

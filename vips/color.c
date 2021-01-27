@@ -1,9 +1,5 @@
 #include "color.h"
-#include "icc_profiles.h"
 #include <unistd.h>
-
-#define SRGB_PROFILE_PATH SRGB_V2_MICRO_ICC_PATH
-#define GRAY_PROFILE_PATH SGRAY_V2_MICRO_ICC_PATH
 
 int is_colorspace_supported(VipsImage *in) {
   return vips_colourspace_issupported(in) ? 1 : 0;

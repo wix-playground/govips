@@ -48,6 +48,7 @@ typedef struct SaveParams {
 
   // WEBP
   BOOL webpLossless;
+  BOOL webpNearLossless;
   int webpReductionEffort;
 
   // HEIF

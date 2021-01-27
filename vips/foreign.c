@@ -100,9 +100,13 @@ int set_png_options(VipsOperation *operation, SaveParams *params) {
 // https://github.com/libvips/libvips/blob/master/libvips/foreign/webpsave.c#L524
 // https://libvips.github.io/libvips/API/current/VipsForeignSave.html#vips-webpsave-buffer
 int set_webp_options(VipsOperation *operation, SaveParams *params) {
-  vips_object_set(VIPS_OBJECT(operation), "strip", params->stripMetadata,
-                  "lossless", params->webpLossless, "reduction_effort",
-                  params->webpReductionEffort, NULL);
+  vips_object_set(
+    VIPS_OBJECT(operation),
+    "strip", params->stripMetadata,
+    "lossless", params->webpLossless,
+    "near_lossless", params->webpNearLossless,
+    "reduction_effort", params->webpReductionEffort, NULL
+  );
 
   if (params->quality) {
     vips_object_set(VIPS_OBJECT(operation), "Q", params->quality, NULL);
@@ -173,6 +177,7 @@ static SaveParams defaultSaveParams = {
   .pngFilter = VIPS_FOREIGN_PNG_FILTER_NONE,
 
   .webpLossless = FALSE,
+  .webpNearLossless = FALSE,
   .webpReductionEffort = 4,
 
   .heifLossless = FALSE,
