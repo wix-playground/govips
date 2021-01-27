@@ -26,11 +26,12 @@ type ImageRef struct {
 	// NOTE: We keep a reference to this so that the input buffer is
 	// never garbage collected during processing. Some image loaders use random
 	// access transcoding and therefore need the original buffer to be in memory.
-	buf               []byte
-	image             *C.VipsImage
-	format            ImageType
-	lock              sync.Mutex
-	preMultiplication *PreMultiplicationState
+	buf                 []byte
+	image               *C.VipsImage
+	format              ImageType
+	lock                sync.Mutex
+	preMultiplication   *PreMultiplicationState
+	optimizedIccProfile string
 }
 
 // ImageMetadata is a data structure holding the width, height, orientation and other metadata of the picture.
@@ -821,20 +822,26 @@ func (r *ImageRef) RemoveICCProfile() error {
 	return nil
 }
 
-// OptimizeICCProfile optimizes the ICC color profile of the image.
-// For two color channel images, it sets a grayscale profile.
-// For color images, it sets a CMYK or non-CMYK profile based on the image metadata.
 func (r *ImageRef) OptimizeICCProfile() error {
-	isCMYK := 0
-	if r.Interpretation() == InterpretationCMYK {
-		isCMYK = 1
+	inputProfile := r.determineInputICCProfile()
+	if !r.HasICCProfile() && (inputProfile == "") {
+		//No embedded ICC profile in the input image and no input profile determined, nothing to do.
+		return nil
 	}
 
-	out, err := vipsOptimizeICCProfile(r.image, isCMYK)
+	r.optimizedIccProfile = C.GoString(C.SRGB_V2_MICRO_ICC_PATH)
+	if r.Bands() <= 2 {
+		r.optimizedIccProfile = C.GoString(C.SGRAY_V2_MICRO_ICC_PATH)
+	}
+
+	embedded := r.HasICCProfile() && (inputProfile == "")
+
+	out, err := vipsICCTransform(r.image, r.optimizedIccProfile, inputProfile, IntentPerceptual, 0, embedded)
 	if err != nil {
-		govipsLog("govips", LogLevelError, err.Error())
+		info(err.Error())
 		return err
 	}
+
 	r.setImage(out)
 	return nil
 }
@@ -1123,6 +1130,13 @@ func (r *ImageRef) ToBytes() ([]byte, error) {
 
 	bytes := C.GoBytes(unsafe.Pointer(cData), C.int(cSize))
 	return bytes, nil
+}
+
+func (r *ImageRef) determineInputICCProfile() (inputProfile string) {
+	if r.Interpretation() == InterpretationCMYK {
+		inputProfile = "cmyk"
+	}
+	return
 }
 
 // ToImage converts a VIPs image to a golang image.Image object, useful for interoperability with other golang libraries
