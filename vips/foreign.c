@@ -79,6 +79,8 @@ int set_jpeg_options(VipsOperation *operation, SaveParams *params) {
   if (params->quality) {
     vips_object_set(VIPS_OBJECT(operation), "Q", params->quality, NULL);
   }
+
+  return 0;
 }
 
 // https://libvips.github.io/libvips/API/current/VipsForeignSave.html#vips-pngsave-buffer
@@ -90,6 +92,8 @@ int set_png_options(VipsOperation *operation, SaveParams *params) {
   if (params->quality) {
     vips_object_set(VIPS_OBJECT(operation), "Q", params->quality, NULL);
   }
+
+  return 0;
 }
 
 // todo: support additional params
@@ -103,6 +107,7 @@ int set_webp_options(VipsOperation *operation, SaveParams *params) {
   if (params->quality) {
     vips_object_set(VIPS_OBJECT(operation), "Q", params->quality, NULL);
   }
+  return 0;
 }
 
 // todo: support additional params
@@ -114,6 +119,7 @@ int set_heif_options(VipsOperation *operation, SaveParams *params) {
   if (params->quality) {
     vips_object_set(VIPS_OBJECT(operation), "Q", params->quality, NULL);
   }
+  return 0;
 }
 
 // https://libvips.github.io/libvips/API/current/VipsForeignSave.html#vips-tiffsave-buffer
@@ -128,6 +134,7 @@ int set_tiff_options(VipsOperation *operation, SaveParams *params) {
   if (params->quality) {
     vips_object_set(VIPS_OBJECT(operation), "Q", params->quality, NULL);
   }
+  return 0;
 }
 
 int save_to_buffer(SaveParams *params) {
@@ -146,37 +153,38 @@ int save_to_buffer(SaveParams *params) {
       g_warning("Unsupported output type given: %d", params->outputFormat);
       return -1;
   }
+  return 0;
 }
 
 static SaveParams defaultSaveParams = {
-  inputImage : NULL,
-  outputBuffer : NULL,
-  outputFormat : JPEG,
-  outputLen : 0,
+  .inputImage = NULL,
+  .outputBuffer = NULL,
+  .outputFormat = JPEG,
+  .outputLen = 0,
 
-  interlace : FALSE,
-  quality : 0,
-  stripMetadata : FALSE,
+  .interlace = FALSE,
+  .quality = 0,
+  .stripMetadata = FALSE,
 
-  jpegOptimizeCoding : FALSE,
-  jpegSubsample : VIPS_FOREIGN_JPEG_SUBSAMPLE_ON,
+  .jpegOptimizeCoding = FALSE,
+  .jpegSubsample = VIPS_FOREIGN_JPEG_SUBSAMPLE_ON,
 
-  pngCompression : 6,
-  pngFilter : VIPS_FOREIGN_PNG_FILTER_NONE,
+  .pngCompression = 6,
+  .pngFilter = VIPS_FOREIGN_PNG_FILTER_NONE,
 
-  webpLossless : FALSE,
-  webpReductionEffort : 4,
+  .webpLossless = FALSE,
+  .webpReductionEffort = 4,
 
-  heifLossless : FALSE,
+  .heifLossless = FALSE,
 
-  tiffCompression : VIPS_FOREIGN_TIFF_COMPRESSION_LZW,
-  tiffPredictor : VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL,
-  tiffPyramid : FALSE,
-  tiffTile : FALSE,
-  tiffTileHeight : 256,
-  tiffTileWidth : 256,
-  tiffXRes : 1.0,
-  tiffYRes : 1.0
+  .tiffCompression = VIPS_FOREIGN_TIFF_COMPRESSION_LZW,
+  .tiffPredictor = VIPS_FOREIGN_TIFF_PREDICTOR_HORIZONTAL,
+  .tiffPyramid = FALSE,
+  .tiffTile = FALSE,
+  .tiffTileHeight = 256,
+  .tiffTileWidth = 256,
+  .tiffXRes = 1.0,
+  .tiffYRes = 1.0
 };
 
 SaveParams create_save_params(ImageType outputFormat) {
