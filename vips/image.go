@@ -141,6 +141,7 @@ type WebpExportParams struct {
 	StripMetadata   bool
 	Quality         int
 	Lossless        bool
+	NearLossless    bool
 	ReductionEffort int
 }
 
