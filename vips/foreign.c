@@ -170,8 +170,8 @@ static SaveParams defaultSaveParams = {
   .quality = 0,
   .stripMetadata = FALSE,
 
-  .jpegOptimizeCoding = FALSE,
-  .jpegSubsample = VIPS_FOREIGN_JPEG_SUBSAMPLE_ON,
+  .jpegOptimizeCoding = TRUE,
+  .jpegSubsample = VIPS_FOREIGN_JPEG_SUBSAMPLE_OFF,
 
   .pngCompression = 6,
   .pngFilter = VIPS_FOREIGN_PNG_FILTER_NONE,

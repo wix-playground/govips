@@ -127,8 +127,10 @@ type JpegExportParams struct {
 // By default, govips creates interlaced JPEGs with a quality of 80/100.
 func NewJpegExportParams() *JpegExportParams {
 	return &JpegExportParams{
-		Quality:   80,
-		Interlace: true,
+		Quality:        80,
+		Interlace:      true,
+		OptimizeCoding: true,
+		Subsampling:    JpegSubsamplingOff,
 	}
 }
 
