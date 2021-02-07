@@ -105,11 +105,22 @@ func NewDefaultWEBPExportParams() *ExportParams {
 	}
 }
 
+type JpegSubsampling int
+
+const (
+	JpegSubsamplingAuto JpegSubsampling = 0
+	JpegSubsamplingOn   JpegSubsampling = 1
+	JpegSubsamplingOff  JpegSubsampling = 2
+	JpegSubsamplingLast JpegSubsampling = 3
+)
+
 // JpegExportParams are options when exporting a JPEG to file or buffer
 type JpegExportParams struct {
-	StripMetadata bool
-	Quality       int
-	Interlace     bool
+	StripMetadata  bool
+	Quality        int
+	Interlace      bool
+	OptimizeCoding bool
+	Subsampling    JpegSubsampling
 }
 
 // NewJpegExportParams creates default values for an export of a JPEG image.

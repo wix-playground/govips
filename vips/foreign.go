@@ -259,6 +259,8 @@ func vipsSaveJPEGToBuffer(in *C.VipsImage, params JpegExportParams) ([]byte, err
 	p.stripMetadata = C.int(boolToInt(params.StripMetadata))
 	p.quality = C.int(params.Quality)
 	p.interlace = C.int(boolToInt(params.Interlace))
+	p.jpegOptimizeCoding = C.int(boolToInt(params.OptimizeCoding))
+	p.jpegSubsample = C.VipsForeignJpegSubsample(params.Subsampling)
 
 	return vipsSaveToBuffer(p)
 }
