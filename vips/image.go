@@ -157,6 +157,7 @@ type WebpExportParams struct {
 	Lossless        bool
 	NearLossless    bool
 	ReductionEffort int
+	IccProfile      string
 }
 
 // NewWebpExportParams creates default values for an export of a WEBP image.
@@ -165,6 +166,7 @@ func NewWebpExportParams() *WebpExportParams {
 	return &WebpExportParams{
 		Quality:         75,
 		Lossless:        false,
+		NearLossless:    false,
 		ReductionEffort: 4,
 	}
 }
@@ -544,7 +546,10 @@ func (r *ImageRef) ExportWebp(params *WebpExportParams) ([]byte, *ImageMetadata,
 		params = NewWebpExportParams()
 	}
 
-	buf, err := vipsSaveWebPToBuffer(r.image, *params)
+	paramsWithIccProfile := *params
+	paramsWithIccProfile.IccProfile = r.optimizedIccProfile
+
+	buf, err := vipsSaveWebPToBuffer(r.image, paramsWithIccProfile)
 	if err != nil {
 		return nil, nil, err
 	}

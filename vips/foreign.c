@@ -105,7 +105,9 @@ int set_webp_options(VipsOperation *operation, SaveParams *params) {
     "strip", params->stripMetadata,
     "lossless", params->webpLossless,
     "near_lossless", params->webpNearLossless,
-    "reduction_effort", params->webpReductionEffort, NULL
+    "reduction_effort", params->webpReductionEffort,
+    "profile", params->webpIccProfile ? params->webpIccProfile : "none",
+    NULL
   );
 
   if (params->quality) {
@@ -179,6 +181,7 @@ static SaveParams defaultSaveParams = {
   .webpLossless = FALSE,
   .webpNearLossless = FALSE,
   .webpReductionEffort = 4,
+  .webpIccProfile = NULL,
 
   .heifLossless = FALSE,
 
